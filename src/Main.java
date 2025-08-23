@@ -27,7 +27,7 @@ public class Main {
         }
 
         System.out.println("FIM DE GAME, SUA VIDA:"+ player.life);
-
+        System.out.println("FIM DE GAME, SUA VIDA:"+ player.life);
     }
 
 }
