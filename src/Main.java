@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
         Mapa mapa = new Mapa(15,15);
@@ -10,7 +12,7 @@ public class Main {
 
         inicioGame(player,pos,inimigo, mapa);
 
-        new Interface();
+        SwingUtilities.invokeLater(() -> new Interface());
 
 
     }
