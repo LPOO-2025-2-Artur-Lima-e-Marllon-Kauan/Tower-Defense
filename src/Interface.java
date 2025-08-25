@@ -9,7 +9,7 @@ public class Interface extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null); // layout absoluto
-
+        setResizable(false);
         // Fundo como JLabel
         ImageIcon fundoIcon = new ImageIcon(getClass().getResource("/imagens/imagem2.jpg"));
         JLabel fundoLabel = new JLabel(fundoIcon);
