@@ -9,6 +9,10 @@ public class Main {
         Player player= new Player(10);
 
         inicioGame(player,pos,inimigo, mapa);
+
+        new Interface();
+
+
     }
     public static void inimigoandando(position pos, Mapa mapa, Player player){
         while(pos.x<mapa.Largura) {
