@@ -3,16 +3,13 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         Mapa mapa = new Mapa(15,15);
-
         position pos = new position(0, 0);
-
-        Inimigo inimigo= new Inimigo(10);
-
+        Inimigo inimigo= new Inimigo.Esqueleto();
         Player player= new Player(10);
 
         inicioGame(player,pos,inimigo, mapa);
 
-        SwingUtilities.invokeLater(() -> new Interface());
+        new Interface();
 
 
     }

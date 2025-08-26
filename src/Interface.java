@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 
 public class Interface extends JFrame {
 
@@ -11,10 +10,16 @@ public class Interface extends JFrame {
         setLayout(null); // layout absoluto
         setResizable(false);
         // Fundo como JLabel
-        ImageIcon fundoIcon = new ImageIcon(getClass().getResource("/imagens/imagem2.jpg"));
+        ImageIcon fundoIcon = new ImageIcon(getClass().getResource("/imagens/combie.png"));
         JLabel fundoLabel = new JLabel(fundoIcon);
         fundoLabel.setBounds(0, 0, fundoIcon.getIconWidth(), fundoIcon.getIconHeight());
         add(fundoLabel);
+
+        ImageIcon inimigoIcon = new ImageIcon(getClass().getResource("/imagens/imagem2.jpg"));
+        JLabel inimigoLabel = new JLabel(inimigoIcon);
+        inimigoLabel.setBounds(10, 10, inimigoIcon.getIconWidth(), inimigoIcon.getIconHeight());
+        add(inimigoLabel);
+
 
 
         setVisible(true);
