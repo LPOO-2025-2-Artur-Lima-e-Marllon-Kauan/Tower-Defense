@@ -1,10 +1,11 @@
+package EntidadesDoJogo;
 
 public class Inimigo {
-int dano;
-int vida;
-int velocidade;
-int posicaox;
-int posicaoy;
+public int dano;
+public int vida;
+public int velocidade;
+public int posicaox;
+public int posicaoy;
 
      public static class Esqueleto extends Inimigo{
 

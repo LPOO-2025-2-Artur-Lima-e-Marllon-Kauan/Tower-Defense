@@ -1,7 +1,9 @@
-public class position {
-    int x, y;
+package Map;
 
-    position(int x, int y) {
+public class position {
+   public int x, y;
+
+    public position(int x, int y) {
         this.x = x;
         this.y = y;
     }

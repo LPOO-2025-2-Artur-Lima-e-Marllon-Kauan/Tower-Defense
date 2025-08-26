@@ -1,4 +1,4 @@
-public class Fase{
+/*public class Fase{
 
     Fase(){
 
@@ -13,4 +13,4 @@ public class Fase{
 
     }
 
-}
+}*/
