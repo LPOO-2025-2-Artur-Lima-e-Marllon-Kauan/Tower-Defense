@@ -5,13 +5,14 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Player {
-    public float life;
+    public int life;
     private int x,y;
     private int dx,dy;
     private Image imagem;
     private int altura,largura;
 
     public Player(){
+        this.life=10;
         this.x=100;
         this.y=100;
 
@@ -63,8 +64,17 @@ public class Player {
         }
 
     }
-public Player(float life){
-    this.life=life;
+    public static boolean isAlive(float life) {
+        return life > 0;
+    }
+public  void TakeDamage() {
+    if (life > 0) {
+        life--;
+        System.out.println("O player levou dano! Vida atual: " + life);
+        }
+    else {
+        System.out.println("O player já está sem vida!");
 
+        }
 }
 }

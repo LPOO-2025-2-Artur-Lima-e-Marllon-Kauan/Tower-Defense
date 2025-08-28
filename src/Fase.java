@@ -1,12 +1,11 @@
-/*public class Fase{
+import EntidadesDoJogo.Player;
 
-    Fase(){
+/*public class Fase {
 
 
 
-    }
+    public void Wave(){
 
-    public static class Wave(){
 
 
 
