@@ -12,7 +12,7 @@ public class Player {
     private int altura,largura;
 
     public Player(){
-        this.life=10;
+        life=10;
         this.x=100;
         this.y=100;
 
@@ -68,13 +68,9 @@ public class Player {
         return life > 0;
     }
 public  void TakeDamage() {
-    if (life > 0) {
-        life--;
-        System.out.println("O player levou dano! Vida atual: " + life);
+    this.life -= 1;
+    if(this.life < 0) this.life = 0;
+}
         }
-    else {
-        System.out.println("O player já está sem vida!");
 
-        }
-}
-}
+
