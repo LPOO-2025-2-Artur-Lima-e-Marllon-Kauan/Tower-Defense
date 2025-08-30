@@ -1,9 +1,18 @@
+import EntidadesDoJogo.Player;
+
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Interface extends JFrame {
+public class Interface extends JFrame implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        player.update();
+    }
 
+    private final Player player;
     public Interface() {
-        setTitle("Minha Interface");
+        setTitle("Tower Defense");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -25,6 +34,9 @@ public class Interface extends JFrame {
 
 
         setVisible(true);
+
+        player = new Player();
+        player.load();
     }
 
 }
