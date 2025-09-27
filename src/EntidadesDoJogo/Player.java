@@ -12,61 +12,13 @@ public class Player {
     private int altura,largura;
 
     public Player(){
-        life=10;
+        life=4;
         this.x=100;
         this.y=100;
 
     }
-    public void load(){
-        ImageIcon referencia = new ImageIcon("imagens\\Dead (1).png");
-        imagem = referencia.getImage();
-        altura = imagem.getHeight(null);
-        largura = imagem.getWidth(null);
-    }
 
-    public void update(){
-        x +=dx;
-        y+=dy;
-
-    }
-
-    public void keyPressed(KeyEvent tecla){
-        int codigo = tecla.getKeyCode();
-
-        if(codigo==KeyEvent.VK_UP){
-            dy = -3;
-        }
-        if(codigo==KeyEvent.VK_DOWN){
-            dy = 3;
-        }
-        if(codigo==KeyEvent.VK_LEFT){
-            dx=-3;
-        }
-        if(codigo==KeyEvent.VK_RIGHT){
-            dx=3;
-        }
-
-    }
-    public void keyRelease(KeyEvent tecla){
-        int codigo = tecla.getKeyCode();
-
-        if(codigo==KeyEvent.VK_UP){
-            dy = 0;
-        }
-        if(codigo==KeyEvent.VK_DOWN){
-            dy = 0;
-        }
-        if(codigo==KeyEvent.VK_LEFT){
-            dx=0;
-        }
-        if(codigo==KeyEvent.VK_RIGHT){
-            dx=0;
-        }
-
-    }
-    public static boolean isAlive(float life) {
-        return life > 0;
-    }
+//metodo para causar dano
 public  void TakeDamage() {
     this.life -= 1;
     if(this.life < 0) this.life = 0;

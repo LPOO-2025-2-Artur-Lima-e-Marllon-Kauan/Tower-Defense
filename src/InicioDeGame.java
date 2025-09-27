@@ -7,11 +7,11 @@ public class InicioDeGame {
 
 
     public  InicioDeGame(){
-
+        //Cria o player.
         Player player= new Player();
+        //Cria a interface.
         new Interface(player);
-        new GameLoop(player);
-        new Inimigo.Esqueleto();
+
     }
 
 }

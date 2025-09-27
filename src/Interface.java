@@ -3,105 +3,92 @@ import EntidadesDoJogo.Player;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Interface extends JFrame implements ActionListener {
-    private JLabel lifeLabel;
-    public java.util.List<Inimigo> inimigos;
+public class Interface extends JFrame {
+    private JLabel lifeLabel, waveLabel;
+    private int basey = 700;
+    private List<Inimigo> inimigos;
+    private Player player;
+    private int currentWave = 1;
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        //player.update();
-    }
-
-    //public final Player player;
     public Interface(Player player) {
-        Inimigo.Esqueleto esqueleto = new Inimigo.Esqueleto();
-        Inimigo.Goblin goblin = new Inimigo.Goblin();
-        int basey = 700;
-        this.inimigos = new ArrayList<>();
-
-
+        this.player = player;
+        // Cria a janela:
         setTitle("Tower Defense");
         setSize(1200, 759);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(null); // layout absoluto
+        setLayout(null);
         setResizable(false);
+        setLocationRelativeTo(null);
 
-
-        // Fundo como JLabel
+        // Fundo
         ImageIcon fundoIcon = new ImageIcon(getClass().getResource("/imagens/imagem2.jpg"));
         JLabel fundoLabel = new JLabel(fundoIcon);
         fundoLabel.setBounds(0, 0, fundoIcon.getIconWidth(), fundoIcon.getIconHeight());
+        add(fundoLabel);
+        setComponentZOrder(fundoLabel, getContentPane().getComponentCount() - 1); // sempre atrás
 
+        // HUD de vida
+        lifeLabel = new JLabel("Vida: " + player.life);
+        lifeLabel.setBounds(20, 20, 200, 30);
+        lifeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        lifeLabel.setForeground(Color.BLACK);
+        add(lifeLabel);
+        setComponentZOrder(lifeLabel, 0);
 
+        // HUD de wave
+        waveLabel = new JLabel("Wave: " + currentWave);
+        waveLabel.setBounds(20, 50, 200, 30);
+        waveLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        add(waveLabel);
+        setComponentZOrder(waveLabel, 0);
 
-       /* ImageIcon inimigoIcon = new ImageIcon(getClass().getResource("/imagens/combie.jpg"));
-        JLabel inimigoLabel = new JLabel(inimigoIcon);
-        inimigoLabel.setBounds(10, 10, inimigoIcon.getIconWidth(), inimigoIcon.getIconHeight());
+        // Lista de Inimigos
+        inimigos = new ArrayList<>();
+        Inimigo.Esqueleto esqueleto = new Inimigo.Esqueleto();
+        Inimigo.Goblin goblin = new Inimigo.Goblin();
+        inimigos.add(esqueleto);
+        inimigos.add(goblin);
 
-*/
-
-
-        //player.load();
-
-        lifeLabel = new JLabel("Vida:" + String.valueOf(player.life));
-        lifeLabel.setBounds(20, 20, 200, 30); // posição no topo
-        lifeLabel.setFont(lifeLabel.getFont().deriveFont(20f)); // deixa maior
-        lifeLabel.setForeground(Color.BLACK); // cor preta
-
-        add(lifeLabel);      // HUD sempre adicionado **antes** do fundo/inimigo
-        add(fundoLabel);   // fundo/inimigo por trás
-        setComponentZOrder(lifeLabel, 0);      // vida na frente
-        setComponentZOrder(fundoLabel, 1);   // fundo atrás
+        for (Inimigo i : inimigos) {
+            add(i.sprite); // adiciona o JLabel do inimigo à janela
+            setComponentZOrder(i.sprite, 0); // na frente do fundo
+        }
 
         setVisible(true);
 
-
-        //player = new Player();
-       /* Timer timer = new Timer(350, e -> { // atualiza a cada 1 segundo
-            if (Player.isAlive(player.life)) {
-                player.TakeDamage();           // diminui a vida
-                lifeLabel.setText("Vida: " + player.life); // atualiza o HUD
-            } else {
-                ((Timer) e.getSource()).stop(); // para o loop
-                JOptionPane.showMessageDialog(this, "Game Over!");
-            }
-
-
-        });
-        timer.start(); // inicia automático*/
-
-
-
-        esqueleto.sprite = new JLabel(esqueleto.iconeRedimensionado);
-        esqueleto.sprite.setBounds(esqueleto.posicaox, esqueleto.posicaoy, esqueleto.iconeRedimensionado.getIconWidth(), esqueleto.iconeRedimensionado.getIconHeight());
-        add(esqueleto.sprite);
-        setComponentZOrder(esqueleto.sprite, 0); // na frente do fundo
-
-
-        goblin.sprite = new JLabel(goblin.iconeRedimensionado);
-        goblin.sprite.setBounds(goblin.posicaox, goblin.posicaoy, goblin.iconeRedimensionado.getIconWidth(), goblin.iconeRedimensionado.getIconHeight());
-        add(goblin.sprite);
-        setComponentZOrder(goblin.sprite, 0);
-
-        inimigos.add(goblin);
-        inimigos.add(esqueleto);
-
-
-        Timer enemyTimer = new Timer(50, e -> {
-            for (Inimigo inimigo : inimigos) {
-                inimigo.updatePosition();
-                if (inimigo.posicaoy >= basey) {
+        // Timer
+        Timer timer = new Timer(50, e -> {
+            for (Inimigo i : inimigos) {
+                i.updatePosition();
+                if (i.posicaoy >= basey) {
+                    // Atualiza vida do player
                     player.TakeDamage();
                     lifeLabel.setText("Vida: " + player.life);
+
+                    // Atualiza wave
+                    currentWave++;
+                    waveLabel.setText("Wave: " + currentWave);
+
+                    // Renasce inimigo individualmente
+                    i.resetPosition();
+
+                    // Verifica fim de jogo
+                    if (player.life <= 0) {
+                        ((Timer) e.getSource()).stop();
+                        JOptionPane.showMessageDialog(this,
+                                "Fim de Jogo!",
+                                "Game Over",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);
+                    }
                 }
             }
         });
-        enemyTimer.start();
+        timer.start();
     }
+
+
 }
