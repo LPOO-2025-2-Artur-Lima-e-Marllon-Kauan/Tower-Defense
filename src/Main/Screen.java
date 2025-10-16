@@ -1,5 +1,8 @@
 package Main;
 
+import inputs.KeyboardListener;
+import inputs.MyMouseListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,6 +13,8 @@ public class Screen extends JPanel {
 
     private Tower_Def tower_def;
     private Dimension size;
+    private MyMouseListener myMouseListener;
+    private KeyboardListener keyboardListener;
     private double timerPerFrame;
     private long lastFrame;
 
@@ -24,6 +29,17 @@ public class Screen extends JPanel {
 
         timerPerFrame = 100000000.0/60.0;
 
+    }
+
+    public void initInputs(){
+        myMouseListener = new MyMouseListener(tower_def);
+        keyboardListener = new KeyboardListener();
+
+        addMouseListener(myMouseListener);
+        addMouseMotionListener(myMouseListener);
+        addKeyListener(keyboardListener);
+
+        requestFocus();
     }
 
     private void setPanelSize() {

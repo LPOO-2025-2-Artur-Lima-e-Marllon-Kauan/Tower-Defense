@@ -28,8 +28,6 @@ public class Tower_Def extends JFrame implements Runnable {
     private final double FPS_SET=120.00;
     private final double UPS_SET=60.00;
 
-    private MyMouseListener myMouseListener;
-    private KeyboardListener keyboardListener;
 
     private Renderizador renderizador;
     private Menu menu;
@@ -44,6 +42,7 @@ public class Tower_Def extends JFrame implements Runnable {
         setTitle("Tower Def");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
 
         initClasses();
 
@@ -61,16 +60,7 @@ public class Tower_Def extends JFrame implements Runnable {
 
     }
 
-    private void initInputs(){
-    myMouseListener = new MyMouseListener();
-    keyboardListener = new KeyboardListener();
 
-    addMouseListener(myMouseListener);
-    addMouseMotionListener(myMouseListener);
-    addKeyListener(keyboardListener);
-
-    requestFocus();
-    }
 
     private void start(){
 gameThread=new Thread(this){};
@@ -101,7 +91,7 @@ if(System.currentTimeMillis() - lastTimeUPS>=1000) {
 
     public static void main(String[] args) {
         Tower_Def tower_def = new Tower_Def();
-        tower_def.initInputs();
+        tower_def.gameScreen.initInputs();
         tower_def.start();
 
 
@@ -137,10 +127,10 @@ if(System.currentTimeMillis() - lastTimeUPS>=1000) {
                 updates++;
             }
         if(System.currentTimeMillis()-lastTimeCheck>=1000){
-System.out.println("FPS:"+frames +"| UPS"+updates);
-frames=0;
-updates=0;
-lastTimeCheck=System.currentTimeMillis();
+            System.out.println("FPS:"+frames +"| UPS"+updates);
+            frames=0;
+            updates=0;
+            lastTimeCheck=System.currentTimeMillis();
         }
 
         }

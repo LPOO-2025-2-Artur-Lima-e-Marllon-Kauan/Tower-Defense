@@ -15,4 +15,24 @@ public class Settings extends CenasDoJogo implements MetodosCenas{
         g.setColor(Color.BLUE);
         g.fillRect(0,0,640,640);
     }
+
+    @Override
+    public void mouseClicando(int x, int y) {
+
+    }
+
+    @Override
+    public void mouseMovendo(int x, int y) {
+
+    }
+
+    @Override
+    public void mousePressionado(int x, int y) {
+
+    }
+
+    @Override
+    public void mouseSolto(int x, int y) {
+
+    }
 }
