@@ -10,6 +10,8 @@ public class Screen extends JPanel {
     private Random random;
     private BufferedImage img;
 
+    private Dimension size;
+
 
     private double timerPerFrame;
     private long lastFrame;
@@ -19,11 +21,22 @@ public class Screen extends JPanel {
 
     public Screen(BufferedImage img) {
         this.img = img;
+
+
+        setPanelSize();
+
         loadSprites();
         random = new Random();
 
         timerPerFrame = 100000000.0/60.0;
 
+    }
+
+    private void setPanelSize() {
+        size = new Dimension(640, 640);
+        setMinimumSize(size);
+        setPreferredSize(size);
+        setMaximumSize(size);
     }
 
     private void loadSprites() {
