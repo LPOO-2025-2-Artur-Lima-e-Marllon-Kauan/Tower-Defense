@@ -1,5 +1,8 @@
 package Main;
 
+import cenas.Menu;
+import cenas.Playing;
+import cenas.Settings;
 import inputs.KeyboardListener;
 import inputs.MyMouseListener;
 
@@ -16,7 +19,7 @@ public class Tower_Def extends JFrame implements Runnable {
 
 
     private Screen gameScreen;
-    private BufferedImage img;
+
 
     private int updates;
     private long lastTimeUPS;
@@ -28,21 +31,34 @@ public class Tower_Def extends JFrame implements Runnable {
     private MyMouseListener myMouseListener;
     private KeyboardListener keyboardListener;
 
+    private Renderizador renderizador;
+    private Menu menu;
+    private Playing playing;
+    private Settings settings;
+
+
+
     public Tower_Def() {
-
-
-        importImg();
 
         // Program window
         setTitle("Tower Def");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        initClasses();
 
-        gameScreen = new Screen(img);
         add(gameScreen); // add JPanel in JFrame
         pack();
         setVisible(true);
+    }
+
+    private void initClasses() {
+        renderizador = new Renderizador(this);
+        gameScreen = new Screen(this);
+        menu = new Menu(this);
+        playing = new Playing(this);
+        settings = new Settings(this);
+
     }
 
     private void initInputs(){
@@ -56,15 +72,6 @@ public class Tower_Def extends JFrame implements Runnable {
     requestFocus();
     }
 
-    private void importImg(  ) {
-        InputStream is = getClass().getResourceAsStream("/Resources/sprite.png");
-
-        try {
-            img = ImageIO.read(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     private void start(){
 gameThread=new Thread(this){};
 
@@ -86,7 +93,7 @@ if(System.currentTimeMillis() - lastTimeUPS>=1000) {
 
     }
     private void updateGame() {
-        updates++;
+        //updates++;
 
        // System.out.println("Game update!");
 
@@ -137,7 +144,23 @@ lastTimeCheck=System.currentTimeMillis();
         }
 
         }
-}
+    }
+
+    public Renderizador getRenderizador(){
+        return renderizador;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public Playing getPlaying() {
+        return playing;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
 
 }
 
