@@ -1,98 +1,67 @@
-package inputs;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
-import Main.GameStates;
-import Main.Tower_Def;
+package inputs;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import Main.Game;
+import Main.GameStates;
 
 public class MyMouseListener implements MouseListener, MouseMotionListener {
+    private Game game;
 
-    private Tower_Def tower_def;
-    public MyMouseListener(Tower_Def tower_def){
-        this.tower_def = tower_def;
+    public MyMouseListener(Game game) {
+        this.game = game;
     }
 
+    public void mouseDragged(MouseEvent e) {
+    }
 
-    @Override
+    public void mouseMoved(MouseEvent e) {
+        switch (GameStates.gameState) {
+            case PLAYING -> this.game.getPlaying().mouseMoved(e.getX(), e.getY());
+            case MENU -> this.game.getMenu().mouseMoved(e.getX(), e.getY());
+            case SETTINGS -> this.game.getSettings().mouseMoved(e.getX(), e.getY());
+        }
+
+    }
+
     public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1){
-            switch (GameStates.gameStates){
-                case PLAYING:
-
-                    break;
-                case MENU:
-                    tower_def.getMenu().mouseClicando(e.getX(), e.getY());
-                    break;
-                case SETTINGS:
-
-                    break;
-
+        if (e.getButton() == 1) {
+            switch (GameStates.gameState) {
+                case PLAYING -> this.game.getPlaying().mouseClicked(e.getX(), e.getY());
+                case MENU -> this.game.getMenu().mouseClicked(e.getX(), e.getY());
+                case SETTINGS -> this.game.getSettings().mouseClicked(e.getX(), e.getY());
             }
         }
+
     }
 
-    @Override
     public void mousePressed(MouseEvent e) {
-        switch (GameStates.gameStates){
-            case PLAYING:
-
-                break;
-            case MENU:
-                tower_def.getMenu().mousePressionado(e.getX(), e.getY());
-                break;
-            case SETTINGS:
-
-                break;
-
+        switch (GameStates.gameState) {
+            case PLAYING -> this.game.getPlaying().mousePressed(e.getX(), e.getY());
+            case MENU -> this.game.getMenu().mousePressed(e.getX(), e.getY());
+            case SETTINGS -> this.game.getSettings().mousePressed(e.getX(), e.getY());
         }
+
     }
 
-    @Override
     public void mouseReleased(MouseEvent e) {
-        switch (GameStates.gameStates){
-            case PLAYING:
-
-                break;
-            case MENU:
-                tower_def.getMenu().mouseSolto(e.getX(), e.getY());
-                break;
-            case SETTINGS:
-
-                break;
-
+        switch (GameStates.gameState) {
+            case PLAYING -> this.game.getPlaying().mouseReleased(e.getX(), e.getY());
+            case MENU -> this.game.getMenu().mouseReleased(e.getX(), e.getY());
+            case SETTINGS -> this.game.getSettings().mouseReleased(e.getX(), e.getY());
         }
+
     }
 
-    @Override
     public void mouseEntered(MouseEvent e) {
-
     }
 
-    @Override
     public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        switch (GameStates.gameStates){
-            case PLAYING:
-                tower_def.getPlaying().mouseMovendo(e.getX(), e.getY());
-                break;
-            case MENU:
-                tower_def.getMenu().mouseMovendo(e.getX(), e.getY());
-                break;
-            case SETTINGS:
-                tower_def.getSettings().mouseMovendo(e.getX(), e.getY());
-                break;
-
-        }
     }
 }

@@ -1,34 +1,20 @@
-package inputs;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
-import Main.GameStates;
+package inputs;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import static Main.GameStates.*;
-
 public class KeyboardListener implements KeyListener {
-    @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
-    @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_A)
-            GameStates.gameStates = MENU;
-
-        else if (e.getKeyCode() == KeyEvent.VK_S) {
-            GameStates.gameStates = PLAYING;
-        }
-
-        else if (e.getKeyCode() == KeyEvent.VK_D) {
-            GameStates.gameStates = SETTINGS;
-        }
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
-
     }
 }
