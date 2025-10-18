@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package Main;
+package main;
 
 import inputs.KeyboardListener;
 import inputs.MyMouseListener;
@@ -32,7 +32,7 @@ public class GameScreen extends JPanel {
     }
 
     private void setPanelSize() {
-        this.size = new Dimension(640, 640);
+        this.size = new Dimension(640, 740);
         this.setMinimumSize(this.size);
         this.setPreferredSize(this.size);
         this.setMaximumSize(this.size);

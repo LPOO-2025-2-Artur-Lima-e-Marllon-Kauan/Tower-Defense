@@ -3,10 +3,13 @@
 // (powered by FernFlower decompiler)
 //
 
-package Main;
+package main;
 
+import helpz.LoadSave;
 import java.awt.Component;
 import javax.swing.JFrame;
+import managers.TileManager;
+import scenes.Editing;
 import scenes.Menu;
 import scenes.Playing;
 import scenes.Settings;
@@ -20,9 +23,12 @@ public class Game extends JFrame implements Runnable {
     private Menu menu;
     private Playing playing;
     private Settings settings;
+    private Editing editing;
+    private TileManager tileManager;
 
     public Game() {
         this.initClasses();
+        this.createDefaultLevel();
         this.setDefaultCloseOperation(3);
         this.setLocationRelativeTo((Component)null);
         this.setResizable(false);
@@ -31,12 +37,24 @@ public class Game extends JFrame implements Runnable {
         this.setVisible(true);
     }
 
+    private void createDefaultLevel() {
+        int[] arr = new int[400];
+
+        for(int i = 0; i < arr.length; ++i) {
+            arr[i] = 0;
+        }
+
+        LoadSave.CreateLevel("new_level", arr);
+    }
+
     private void initClasses() {
+        this.tileManager = new TileManager();
         this.render = new Render(this);
         this.gameScreen = new GameScreen(this);
         this.menu = new Menu(this);
         this.playing = new Playing(this);
         this.settings = new Settings(this);
+        this.editing = new Editing(this);
     }
 
     private void start() {
@@ -100,5 +118,13 @@ public class Game extends JFrame implements Runnable {
 
     public Settings getSettings() {
         return this.settings;
+    }
+
+    public Editing getEditor() {
+        return this.editing;
+    }
+
+    public TileManager getTileManager() {
+        return this.tileManager;
     }
 }

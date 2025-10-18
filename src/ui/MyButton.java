@@ -10,10 +10,11 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 public class MyButton {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public int id;
     private String text;
     private Rectangle bounds;
     private boolean mouseOver;
@@ -25,6 +26,17 @@ public class MyButton {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.id = -1;
+        this.initBounds();
+    }
+
+    public MyButton(String text, int x, int y, int width, int height, int id) {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.id = id;
         this.initBounds();
     }
 
@@ -77,7 +89,19 @@ public class MyButton {
         this.mouseOver = mouseOver;
     }
 
+    public boolean isMouseOver() {
+        return this.mouseOver;
+    }
+
+    public boolean isMousePressed() {
+        return this.mousePressed;
+    }
+
     public Rectangle getBounds() {
         return this.bounds;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

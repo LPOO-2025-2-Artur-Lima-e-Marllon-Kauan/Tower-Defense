@@ -3,34 +3,35 @@
 // (powered by FernFlower decompiler)
 //
 
-package scenes;
+package ui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import main.Game;
 import main.GameStates;
-import ui.MyButton;
+import scenes.Playing;
 
-public class Settings extends GameScene implements SceneMethods {
+public class ActionBar extends Bar {
+    private Playing playing;
     private MyButton bMenu;
 
-    public Settings(Game game) {
-        super(game);
+    public ActionBar(int x, int y, int width, int height, Playing playing) {
+        super(x, y, width, height);
+        this.playing = playing;
         this.initButtons();
     }
 
     private void initButtons() {
-        this.bMenu = new MyButton("Menu", 2, 2, 100, 30);
-    }
-
-    public void render(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(0, 0, 640, 640);
-        this.drawButtons(g);
+        this.bMenu = new MyButton("Menu", 2, 642, 100, 30);
     }
 
     private void drawButtons(Graphics g) {
         this.bMenu.draw(g);
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(new Color(220, 123, 15));
+        g.fillRect(this.x, this.y, this.width, this.height);
+        this.drawButtons(g);
     }
 
     public void mouseClicked(int x, int y) {
@@ -56,13 +57,6 @@ public class Settings extends GameScene implements SceneMethods {
     }
 
     public void mouseReleased(int x, int y) {
-        this.resetButtons();
-    }
-
-    private void resetButtons() {
         this.bMenu.resetBooleans();
-    }
-
-    public void mouseDragged(int x, int y) {
     }
 }

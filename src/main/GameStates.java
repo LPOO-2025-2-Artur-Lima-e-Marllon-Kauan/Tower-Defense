@@ -3,12 +3,13 @@
 // (powered by FernFlower decompiler)
 //
 
-package Main;
+package main;
 
 public enum GameStates {
     PLAYING,
     MENU,
-    SETTINGS;
+    SETTINGS,
+    EDIT;
 
     public static GameStates gameState = MENU;
 

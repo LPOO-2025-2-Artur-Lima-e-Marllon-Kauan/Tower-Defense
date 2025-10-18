@@ -5,7 +5,7 @@
 
 package scenes;
 
-import Main.Game;
+import main.Game;
 
 public class GameScene {
     protected Game game;

@@ -17,4 +17,6 @@ public interface SceneMethods {
     void mousePressed(int var1, int var2);
 
     void mouseReleased(int var1, int var2);
+
+    void mouseDragged(int var1, int var2);
 }

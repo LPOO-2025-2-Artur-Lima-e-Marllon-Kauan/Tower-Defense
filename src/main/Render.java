@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package Main;
+package main;
 
 import java.awt.Graphics;
 
@@ -19,6 +19,7 @@ public class Render {
             case PLAYING -> this.game.getPlaying().render(g);
             case MENU -> this.game.getMenu().render(g);
             case SETTINGS -> this.game.getSettings().render(g);
+            case EDIT -> this.game.getEditor().render(g);
         }
 
     }
