@@ -12,14 +12,12 @@ public class Tile {
 		this.sprite[0] = sprite;
 		this.id = id;
 		this.tileType = tileType;
-
 	}
 
 	public Tile(BufferedImage[] sprite, int id, int tileType) {
 		this.sprite = sprite;
 		this.id = id;
 		this.tileType = tileType;
-
 	}
 
 	public int getTileType() {
