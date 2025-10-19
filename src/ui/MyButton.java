@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package ui;
 
 import java.awt.Color;
@@ -10,98 +5,105 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 public class MyButton {
-    public int x;
-    public int y;
-    public int width;
-    public int height;
-    public int id;
-    private String text;
-    private Rectangle bounds;
-    private boolean mouseOver;
-    private boolean mousePressed;
 
-    public MyButton(String text, int x, int y, int width, int height) {
-        this.text = text;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.id = -1;
-        this.initBounds();
-    }
+	public int x, y, width, height, id;
+	private String text;
+	private Rectangle bounds;
+	private boolean mouseOver, mousePressed;
 
-    public MyButton(String text, int x, int y, int width, int height, int id) {
-        this.text = text;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.id = id;
-        this.initBounds();
-    }
+	// For normal Buttons
+	public MyButton(String text, int x, int y, int width, int height) {
+		this.text = text;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.id = -1;
 
-    private void initBounds() {
-        this.bounds = new Rectangle(this.x, this.y, this.width, this.height);
-    }
+		initBounds();
+	}
 
-    public void draw(Graphics g) {
-        this.drawBody(g);
-        this.drawBorder(g);
-        this.drawText(g);
-    }
+	// For tile buttons
+	public MyButton(String text, int x, int y, int width, int height, int id) {
+		this.text = text;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.id = id;
 
-    private void drawBorder(Graphics g) {
-        g.setColor(Color.black);
-        g.drawRect(this.x, this.y, this.width, this.height);
-        if (this.mousePressed) {
-            g.drawRect(this.x + 1, this.y + 1, this.width - 2, this.height - 2);
-            g.drawRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
-        }
+		initBounds();
+	}
 
-    }
+	private void initBounds() {
+		this.bounds = new Rectangle(x, y, width, height);
+	}
 
-    private void drawBody(Graphics g) {
-        if (this.mouseOver) {
-            g.setColor(Color.gray);
-        } else {
-            g.setColor(Color.WHITE);
-        }
+	public void draw(Graphics g) {
+		// Body
+		drawBody(g);
 
-        g.fillRect(this.x, this.y, this.width, this.height);
-    }
+		// Border
+		drawBorder(g);
 
-    private void drawText(Graphics g) {
-        int w = g.getFontMetrics().stringWidth(this.text);
-        int h = g.getFontMetrics().getHeight();
-        g.drawString(this.text, this.x - w / 2 + this.width / 2, this.y + h / 2 + this.height / 2);
-    }
+		// Text
+		drawText(g);
+	}
 
-    public void resetBooleans() {
-        this.mouseOver = false;
-        this.mousePressed = false;
-    }
+	private void drawBorder(Graphics g) {
 
-    public void setMousePressed(boolean mousePressed) {
-        this.mousePressed = mousePressed;
-    }
+		g.setColor(Color.black);
+		g.drawRect(x, y, width, height);
+		if (mousePressed) {
+			g.drawRect(x + 1, y + 1, width - 2, height - 2);
+			g.drawRect(x + 2, y + 2, width - 4, height - 4);
+		}
 
-    public void setMouseOver(boolean mouseOver) {
-        this.mouseOver = mouseOver;
-    }
+	}
 
-    public boolean isMouseOver() {
-        return this.mouseOver;
-    }
+	private void drawBody(Graphics g) {
+		if (mouseOver)
+			g.setColor(Color.gray);
+		else
+			g.setColor(Color.WHITE);
+		g.fillRect(x, y, width, height);
 
-    public boolean isMousePressed() {
-        return this.mousePressed;
-    }
+	}
 
-    public Rectangle getBounds() {
-        return this.bounds;
-    }
+	private void drawText(Graphics g) {
+		int w = g.getFontMetrics().stringWidth(text);
+		int h = g.getFontMetrics().getHeight();
+		g.drawString(text, x - w / 2 + width / 2, y + h / 2 + height / 2);
 
-    public int getId() {
-        return this.id;
-    }
+	}
+
+	public void resetBooleans() {
+		this.mouseOver = false;
+		this.mousePressed = false;
+	}
+
+	public void setMousePressed(boolean mousePressed) {
+		this.mousePressed = mousePressed;
+	}
+
+	public void setMouseOver(boolean mouseOver) {
+		this.mouseOver = mouseOver;
+	}
+
+	public boolean isMouseOver() {
+		return mouseOver;
+	}
+
+	public boolean isMousePressed() {
+		return mousePressed;
+	}
+
+	public Rectangle getBounds() {
+		return bounds;
+	}
+
+	public int getId() {
+		return id;
+	}
+
 }

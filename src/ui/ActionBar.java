@@ -1,62 +1,66 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package ui;
+
+import static main.GameStates.MENU;
+import static main.GameStates.SetGameState;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import main.GameStates;
+
 import scenes.Playing;
 
 public class ActionBar extends Bar {
-    private Playing playing;
-    private MyButton bMenu;
 
-    public ActionBar(int x, int y, int width, int height, Playing playing) {
-        super(x, y, width, height);
-        this.playing = playing;
-        this.initButtons();
-    }
+	private Playing playing;
+	private MyButton bMenu;
 
-    private void initButtons() {
-        this.bMenu = new MyButton("Menu", 2, 642, 100, 30);
-    }
+	public ActionBar(int x, int y, int width, int height, Playing playing) {
+		super(x, y, width, height);
+		this.playing = playing;
 
-    private void drawButtons(Graphics g) {
-        this.bMenu.draw(g);
-    }
+		initButtons();
+	}
 
-    public void draw(Graphics g) {
-        g.setColor(new Color(220, 123, 15));
-        g.fillRect(this.x, this.y, this.width, this.height);
-        this.drawButtons(g);
-    }
+	private void initButtons() {
 
-    public void mouseClicked(int x, int y) {
-        if (this.bMenu.getBounds().contains(x, y)) {
-            GameStates.SetGameState(GameStates.MENU);
-        }
+		bMenu = new MyButton("Menu", 2, 642, 100, 30);
 
-    }
+	}
 
-    public void mouseMoved(int x, int y) {
-        this.bMenu.setMouseOver(false);
-        if (this.bMenu.getBounds().contains(x, y)) {
-            this.bMenu.setMouseOver(true);
-        }
+	private void drawButtons(Graphics g) {
+		bMenu.draw(g);
+	}
 
-    }
+	public void draw(Graphics g) {
 
-    public void mousePressed(int x, int y) {
-        if (this.bMenu.getBounds().contains(x, y)) {
-            this.bMenu.setMousePressed(true);
-        }
+		// Background
+		g.setColor(new Color(220, 123, 15));
+		g.fillRect(x, y, width, height);
 
-    }
+		// Buttons
+		drawButtons(g);
+	}
 
-    public void mouseReleased(int x, int y) {
-        this.bMenu.resetBooleans();
-    }
+	public void mouseClicked(int x, int y) {
+		if (bMenu.getBounds().contains(x, y))
+			SetGameState(MENU);
+
+	}
+
+	public void mouseMoved(int x, int y) {
+		bMenu.setMouseOver(false);
+		if (bMenu.getBounds().contains(x, y))
+			bMenu.setMouseOver(true);
+	}
+
+	public void mousePressed(int x, int y) {
+		if (bMenu.getBounds().contains(x, y))
+			bMenu.setMousePressed(true);
+
+	}
+
+	public void mouseReleased(int x, int y) {
+		bMenu.resetBooleans();
+
+	}
+
 }
