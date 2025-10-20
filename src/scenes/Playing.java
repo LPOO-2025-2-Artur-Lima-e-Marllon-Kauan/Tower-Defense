@@ -38,8 +38,8 @@ public class Playing extends GameScene implements SceneMethods {
     }
 
     private void loadDefaultLevel() {
-        this.lvl = LoadSave.GetLevelData("/new_level.txt");
-        ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("/new_level.txt");
+        this.lvl = LoadSave.GetLevelData("new_level");
+        ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("new_level");
         this.start = (PathPoint)points.get(0);
         this.end = (PathPoint)points.get(1);
     }
