@@ -1,20 +1,22 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package scenes;
 
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 
 public interface SceneMethods {
+    void render(Graphics var1);
 
-	public void render(Graphics g);
+    void mouseClicked(int var1, int var2);
 
-	public void mouseClicked(int x, int y);
+    void mouseMoved(int var1, int var2);
 
-	public void mouseMoved(int x, int y);
+    void mousePressed(int var1, int var2);
 
-	public void mousePressed(int x, int y);
+    void mouseReleased(int var1, int var2);
 
-	public void mouseReleased(int x, int y);
-	
-	public void mouseDragged(int x, int y);
-
+    void mouseDragged(int var1, int var2);
 }

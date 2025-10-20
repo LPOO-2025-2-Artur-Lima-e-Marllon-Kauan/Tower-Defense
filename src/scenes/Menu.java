@@ -1,111 +1,103 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package scenes;
 
 import java.awt.Graphics;
 import main.Game;
+import main.GameStates;
 import ui.MyButton;
-import static main.GameStates.*;
 
 public class Menu extends GameScene implements SceneMethods {
+    private MyButton bPlaying;
+    private MyButton bEdit;
+    private MyButton bSettings;
+    private MyButton bQuit;
 
-	private MyButton bPlaying, bEdit, bSettings, bQuit;
+    public Menu(Game game) {
+        super(game);
+        this.initButtons();
+    }
 
-	public Menu(Game game) {
-		super(game);
-		initButtons();
-	}
+    private void initButtons() {
+        int w = 150;
+        int h = w / 3;
+        int x = 320 - w / 2;
+        int y = 150;
+        int yOffset = 100;
+        this.bPlaying = new MyButton("Play", x, y, w, h);
+        this.bEdit = new MyButton("Edit", x, y + yOffset, w, h);
+        this.bSettings = new MyButton("Settings", x, y + yOffset * 2, w, h);
+        this.bQuit = new MyButton("Quit", x, y + yOffset * 3, w, h);
+    }
 
-	private void initButtons() {
+    public void render(Graphics g) {
+        this.drawButtons(g);
+    }
 
-		int w = 150;
-		int h = w / 3;
-		int x = 640 / 2 - w / 2;
-		int y = 150;
-		int yOffset = 100;
+    private void drawButtons(Graphics g) {
+        this.bPlaying.draw(g);
+        this.bEdit.draw(g);
+        this.bSettings.draw(g);
+        this.bQuit.draw(g);
+    }
 
-		bPlaying = new MyButton("Play", x, y, w, h);
-		bEdit = new MyButton("Edit", x, y + yOffset, w, h);
-		bSettings = new MyButton("Settings", x, y + yOffset * 2, w, h);
-		bQuit = new MyButton("Quit", x, y + yOffset * 3, w, h);
+    public void mouseClicked(int x, int y) {
+        if (this.bPlaying.getBounds().contains(x, y)) {
+            GameStates.SetGameState(GameStates.PLAYING);
+        } else if (this.bEdit.getBounds().contains(x, y)) {
+            GameStates.SetGameState(GameStates.EDIT);
+        } else if (this.bSettings.getBounds().contains(x, y)) {
+            GameStates.SetGameState(GameStates.SETTINGS);
+        } else if (this.bQuit.getBounds().contains(x, y)) {
+            System.exit(0);
+        }
 
-	}
+    }
 
-	@Override
-	public void render(Graphics g) {
+    public void mouseMoved(int x, int y) {
+        this.bPlaying.setMouseOver(false);
+        this.bEdit.setMouseOver(false);
+        this.bSettings.setMouseOver(false);
+        this.bQuit.setMouseOver(false);
+        if (this.bPlaying.getBounds().contains(x, y)) {
+            this.bPlaying.setMouseOver(true);
+        } else if (this.bEdit.getBounds().contains(x, y)) {
+            this.bEdit.setMouseOver(true);
+        } else if (this.bSettings.getBounds().contains(x, y)) {
+            this.bSettings.setMouseOver(true);
+        } else if (this.bQuit.getBounds().contains(x, y)) {
+            this.bQuit.setMouseOver(true);
+        }
 
-		drawButtons(g);
+    }
 
-	}
+    public void mousePressed(int x, int y) {
+        if (this.bPlaying.getBounds().contains(x, y)) {
+            this.bPlaying.setMousePressed(true);
+        } else if (this.bEdit.getBounds().contains(x, y)) {
+            this.bEdit.setMousePressed(true);
+        } else if (this.bSettings.getBounds().contains(x, y)) {
+            this.bSettings.setMousePressed(true);
+        } else if (this.bQuit.getBounds().contains(x, y)) {
+            this.bQuit.setMousePressed(true);
+        }
 
-	private void drawButtons(Graphics g) {
-		bPlaying.draw(g);
-		bEdit.draw(g);
-		bSettings.draw(g);
-		bQuit.draw(g);
+    }
 
-	}
+    public void mouseReleased(int x, int y) {
+        this.resetButtons();
+    }
 
-	@Override
-	public void mouseClicked(int x, int y) {
+    private void resetButtons() {
+        this.bPlaying.resetBooleans();
+        this.bEdit.resetBooleans();
+        this.bSettings.resetBooleans();
+        this.bQuit.resetBooleans();
+    }
 
-		if (bPlaying.getBounds().contains(x, y))
-			SetGameState(PLAYING);
-		else if (bEdit.getBounds().contains(x, y))
-			SetGameState(EDIT);
-		else if (bSettings.getBounds().contains(x, y))
-			SetGameState(SETTINGS);
-		else if (bQuit.getBounds().contains(x, y))
-			System.exit(0);
-	}
-
-	@Override
-	public void mouseMoved(int x, int y) {
-		bPlaying.setMouseOver(false);
-		bEdit.setMouseOver(false);
-		bSettings.setMouseOver(false);
-		bQuit.setMouseOver(false);
-
-		if (bPlaying.getBounds().contains(x, y))
-			bPlaying.setMouseOver(true);
-		else if (bEdit.getBounds().contains(x, y))
-			bEdit.setMouseOver(true);
-		else if (bSettings.getBounds().contains(x, y))
-			bSettings.setMouseOver(true);
-		else if (bQuit.getBounds().contains(x, y))
-			bQuit.setMouseOver(true);
-
-	}
-
-	@Override
-	public void mousePressed(int x, int y) {
-
-		if (bPlaying.getBounds().contains(x, y))
-			bPlaying.setMousePressed(true);
-		else if (bEdit.getBounds().contains(x, y))
-			bEdit.setMousePressed(true);
-		else if (bSettings.getBounds().contains(x, y))
-			bSettings.setMousePressed(true);
-		else if (bQuit.getBounds().contains(x, y))
-			bQuit.setMousePressed(true);
-
-	}
-
-	@Override
-	public void mouseReleased(int x, int y) {
-		resetButtons();
-	}
-
-	private void resetButtons() {
-		bPlaying.resetBooleans();
-		bEdit.resetBooleans();
-		bSettings.resetBooleans();
-		bQuit.resetBooleans();
-
-	}
-
-	@Override
-	public void mouseDragged(int x, int y) {
-		// TODO Auto-generated method stub
-
-	}
-
+    public void mouseDragged(int x, int y) {
+    }
 }

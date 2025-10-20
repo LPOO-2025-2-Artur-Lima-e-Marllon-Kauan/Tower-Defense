@@ -1,169 +1,169 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package scenes;
 
+import helpz.LoadSave;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
-
-import helpz.LoadSave;
 import main.Game;
 import objects.PathPoint;
 import objects.Tile;
 import ui.Toolbar;
 
-import static helpz.Constants.Tiles.ROAD_TILE;
-
 public class Editing extends GameScene implements SceneMethods {
+    private int[][] lvl;
+    private Tile selectedTile;
+    private int mouseX;
+    private int mouseY;
+    private int lastTileX;
+    private int lastTileY;
+    private int lastTileId;
+    private boolean drawSelect;
+    private Toolbar toolbar;
+    private PathPoint start;
+    private PathPoint end;
 
-	private int[][] lvl;
-	private Tile selectedTile;
-	private int mouseX, mouseY;
-	private int lastTileX, lastTileY, lastTileId;
-	private boolean drawSelect;
-	private Toolbar toolbar;
-	private PathPoint start, end;
+    public Editing(Game game) {
+        super(game);
+        this.loadDefaultLevel();
+        this.toolbar = new Toolbar(0, 640, 640, 160, this);
+    }
 
-	public Editing(Game game) {
-		super(game);
-		loadDefaultLevel();
-		toolbar = new Toolbar(0, 640, 640, 160, this);
-	}
+    private void loadDefaultLevel() {
+        this.lvl = LoadSave.GetLevelData("new_level");
+        ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("new_level");
+        this.start = (PathPoint)points.get(0);
+        this.end = (PathPoint)points.get(1);
+    }
 
-	private void loadDefaultLevel() {
-		lvl = LoadSave.GetLevelData("new_level");
-		ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("new_level");
-		start = points.get(0);
-		end = points.get(1);
-	}
+    public void update() {
+        this.updateTick();
+    }
 
-	public void update() {
-		updateTick();
-	}
+    public void render(Graphics g) {
+        this.drawLevel(g);
+        this.toolbar.draw(g);
+        this.drawSelectedTile(g);
+        this.drawPathPoints(g);
+    }
 
-	@Override
-	public void render(Graphics g) {
+    private void drawPathPoints(Graphics g) {
+        if (this.start != null) {
+            g.drawImage(this.toolbar.getStartPathImg(), this.start.getxCord() * 32, this.start.getyCord() * 32, 32, 32, (ImageObserver)null);
+        }
 
-		drawLevel(g);
-		toolbar.draw(g);
-		drawSelectedTile(g);
-		drawPathPoints(g);
+        if (this.end != null) {
+            g.drawImage(this.toolbar.getEndPathImg(), this.end.getxCord() * 32, this.end.getyCord() * 32, 32, 32, (ImageObserver)null);
+        }
 
-	}
+    }
 
-	private void drawPathPoints(Graphics g) {
-		if (start != null)
-			g.drawImage(toolbar.getStartPathImg(), start.getxCord() * 32, start.getyCord() * 32, 32, 32, null);
+    private void drawLevel(Graphics g) {
+        for(int y = 0; y < this.lvl.length; ++y) {
+            for(int x = 0; x < this.lvl[y].length; ++x) {
+                int id = this.lvl[y][x];
+                if (this.isAnimation(id)) {
+                    g.drawImage(this.getSprite(id, this.animationIndex), x * 32, y * 32, (ImageObserver)null);
+                } else {
+                    g.drawImage(this.getSprite(id), x * 32, y * 32, (ImageObserver)null);
+                }
+            }
+        }
 
-		if (end != null)
-			g.drawImage(toolbar.getEndPathImg(), end.getxCord() * 32, end.getyCord() * 32, 32, 32, null);
+    }
 
-	}
+    private void drawSelectedTile(Graphics g) {
+        if (this.selectedTile != null && this.drawSelect) {
+            g.drawImage(this.selectedTile.getSprite(), this.mouseX, this.mouseY, 32, 32, (ImageObserver)null);
+        }
 
-	private void drawLevel(Graphics g) {
-		for (int y = 0; y < lvl.length; y++) {
-			for (int x = 0; x < lvl[y].length; x++) {
-				int id = lvl[y][x];
-				if (isAnimation(id)) {
-					g.drawImage(getSprite(id, animationIndex), x * 32, y * 32, null);
-				} else
-					g.drawImage(getSprite(id), x * 32, y * 32, null);
-			}
-		}
-	}
+    }
 
-	private void drawSelectedTile(Graphics g) {
-		if (selectedTile != null && drawSelect) {
-			g.drawImage(selectedTile.getSprite(), mouseX, mouseY, 32, 32, null);
-		}
-	}
+    public void saveLevel() {
+        LoadSave.SaveLevel("new_level", this.lvl, this.start, this.end);
+        this.game.getPlaying().setLevel(this.lvl);
+    }
 
-	public void saveLevel() {
+    public void setSelectedTile(Tile tile) {
+        this.selectedTile = tile;
+        this.drawSelect = true;
+    }
 
-		LoadSave.SaveLevel("new_level", lvl, start, end);
-		game.getPlaying().setLevel(lvl);
+    private void changeTile(int x, int y) {
+        if (this.selectedTile != null) {
+            int tileX = x / 32;
+            int tileY = y / 32;
+            if (this.selectedTile.getId() >= 0) {
+                if (this.lastTileX == tileX && this.lastTileY == tileY && this.lastTileId == this.selectedTile.getId()) {
+                    return;
+                }
 
-	}
+                this.lastTileX = tileX;
+                this.lastTileY = tileY;
+                this.lastTileId = this.selectedTile.getId();
+                this.lvl[tileY][tileX] = this.selectedTile.getId();
+            } else {
+                int id = this.lvl[tileY][tileX];
+                if (this.game.getTileManager().getTile(id).getTileType() == 2) {
+                    if (this.selectedTile.getId() == -1) {
+                        this.start = new PathPoint(tileX, tileY);
+                    } else {
+                        this.end = new PathPoint(tileX, tileY);
+                    }
+                }
+            }
+        }
 
-	public void setSelectedTile(Tile tile) {
-		this.selectedTile = tile;
-		drawSelect = true;
-	}
+    }
 
-	private void changeTile(int x, int y) {
-		if (selectedTile != null) {
-			int tileX = x / 32;
-			int tileY = y / 32;
+    public void mouseClicked(int x, int y) {
+        if (y >= 640) {
+            this.toolbar.mouseClicked(x, y);
+        } else {
+            this.changeTile(this.mouseX, this.mouseY);
+        }
 
-			if (selectedTile.getId() >= 0) {
-				if (lastTileX == tileX && lastTileY == tileY && lastTileId == selectedTile.getId())
-					return;
+    }
 
-				lastTileX = tileX;
-				lastTileY = tileY;
-				lastTileId = selectedTile.getId();
+    public void mouseMoved(int x, int y) {
+        if (y >= 640) {
+            this.toolbar.mouseMoved(x, y);
+            this.drawSelect = false;
+        } else {
+            this.drawSelect = true;
+            this.mouseX = x / 32 * 32;
+            this.mouseY = y / 32 * 32;
+        }
 
-				lvl[tileY][tileX] = selectedTile.getId();
-			} else {
-				int id = lvl[tileY][tileX];
-				if (game.getTileManager().getTile(id).getTileType() == ROAD_TILE) {
-					if (selectedTile.getId() == -1)
-						start = new PathPoint(tileX, tileY);
-					else
-						end = new PathPoint(tileX, tileY);
-				}
-			}
-		}
-	}
+    }
 
-	@Override
-	public void mouseClicked(int x, int y) {
-		if (y >= 640) {
-			toolbar.mouseClicked(x, y);
-		} else {
-			changeTile(mouseX, mouseY);
-		}
+    public void mousePressed(int x, int y) {
+        if (y >= 640) {
+            this.toolbar.mousePressed(x, y);
+        }
 
-	}
+    }
 
-	@Override
-	public void mouseMoved(int x, int y) {
+    public void mouseReleased(int x, int y) {
+        this.toolbar.mouseReleased(x, y);
+    }
 
-		if (y >= 640) {
-			toolbar.mouseMoved(x, y);
-			drawSelect = false;
-		} else {
-			drawSelect = true;
-			mouseX = (x / 32) * 32;
-			mouseY = (y / 32) * 32;
-		}
+    public void mouseDragged(int x, int y) {
+        if (y < 640) {
+            this.changeTile(x, y);
+        }
 
-	}
+    }
 
-	@Override
-	public void mousePressed(int x, int y) {
-		if (y >= 640)
-			toolbar.mousePressed(x, y);
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == 82) {
+            this.toolbar.rotateSprite();
+        }
 
-	}
-
-	@Override
-	public void mouseReleased(int x, int y) {
-		toolbar.mouseReleased(x, y);
-
-	}
-
-	@Override
-	public void mouseDragged(int x, int y) {
-		if (y >= 640) {
-
-		} else {
-			changeTile(x, y);
-		}
-
-	}
-
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_R)
-			toolbar.rotateSprite();
-	}
-
+    }
 }

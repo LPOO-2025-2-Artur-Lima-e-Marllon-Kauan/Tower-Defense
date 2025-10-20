@@ -1,36 +1,34 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package inputs;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
-import static main.GameStates.*;
-
 import main.Game;
 import main.GameStates;
 
 public class KeyboardListener implements KeyListener {
-	private Game game;
+    private Game game;
 
-	public KeyboardListener(Game game) {
-		this.game = game;
-	}
+    public KeyboardListener(Game game) {
+        this.game = game;
+    }
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-	}
+    public void keyTyped(KeyEvent e) {
+    }
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (GameStates.gameState == EDIT)
-			game.getEditor().keyPressed(e);
+    public void keyPressed(KeyEvent e) {
+        if (GameStates.gameState == GameStates.EDIT) {
+            this.game.getEditor().keyPressed(e);
+        } else if (GameStates.gameState == GameStates.PLAYING) {
+            this.game.getPlaying().keyPressed(e);
+        }
 
-	}
+    }
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
+    public void keyReleased(KeyEvent e) {
+    }
 }

@@ -1,76 +1,96 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package enemies;
 
+import helpz.Constants.Enemies;
 import java.awt.Rectangle;
-import static helpz.Constants.Direction.*;
 
 public abstract class Enemy {
+    protected float x;
+    protected float y;
+    protected Rectangle bounds;
+    protected int health;
+    protected int maxHealth;
+    protected int ID;
+    protected int enemyType;
+    protected int lastDir;
+    protected boolean alive = true;
 
-	private float x, y;
-	private Rectangle bounds;
-	private int health;
-	private int ID;
-	private int enemyType;
-	private int lastDir;
+    public Enemy(float x, float y, int ID, int enemyType) {
+        this.x = x;
+        this.y = y;
+        this.ID = ID;
+        this.enemyType = enemyType;
+        this.bounds = new Rectangle((int)x, (int)y, 32, 32);
+        this.lastDir = -1;
+        this.setStartHealth();
+    }
 
-	public Enemy(float x, float y, int ID, int enemyType) {
-		this.x = x;
-		this.y = y;
-		this.ID = ID;
-		this.enemyType = enemyType;
-		bounds = new Rectangle((int) x, (int) y, 32, 32);
-		lastDir = -1;
-	}
+    private void setStartHealth() {
+        this.health = Enemies.GetStartHealth(this.enemyType);
+        this.maxHealth = this.health;
+    }
 
-	public void move(float speed, int dir) {
-		lastDir = dir;
-		switch (dir) {
-		case LEFT:
-			this.x -= speed;
-			break;
-		case UP:
-			this.y -= speed;
-			break;
-		case RIGHT:
-			this.x += speed;
-			break;
-		case DOWN:
-			this.y += speed;
-			break;
-		}
-	}
+    public void hurt(int dmg) {
+        this.health -= dmg;
+        if (this.health <= 0) {
+            this.alive = false;
+        }
 
-	public void setPos(int x, int y) {
-		// Don't use this one for moving the enemy.
-		this.x = x;
-		this.y = y;
-	}
+    }
 
-	public float getX() {
-		return x;
-	}
+    public void move(float speed, int dir) {
+        this.lastDir = dir;
+        switch (dir) {
+            case 0 -> this.x -= speed;
+            case 1 -> this.y -= speed;
+            case 2 -> this.x += speed;
+            case 3 -> this.y += speed;
+        }
 
-	public float getY() {
-		return y;
-	}
+    }
 
-	public Rectangle getBounds() {
-		return bounds;
-	}
+    public void setPos(int x, int y) {
+        this.x = (float)x;
+        this.y = (float)y;
+    }
 
-	public int getHealth() {
-		return health;
-	}
+    public float getHealthBarFloat() {
+        return (float)this.health / (float)this.maxHealth;
+    }
 
-	public int getID() {
-		return ID;
-	}
+    public float getX() {
+        return this.x;
+    }
 
-	public int getEnemyType() {
-		return enemyType;
-	}
+    public float getY() {
+        return this.y;
+    }
 
-	public int getLastDir() {
-		return lastDir;
-	}
+    public Rectangle getBounds() {
+        return this.bounds;
+    }
 
+    public int getHealth() {
+        return this.health;
+    }
+
+    public int getID() {
+        return this.ID;
+    }
+
+    public int getEnemyType() {
+        return this.enemyType;
+    }
+
+    public int getLastDir() {
+        return this.lastDir;
+    }
+
+    public boolean isAlive() {
+        return this.alive;
+    }
 }

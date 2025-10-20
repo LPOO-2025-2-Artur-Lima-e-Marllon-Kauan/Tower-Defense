@@ -1,145 +1,174 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package scenes;
 
-import java.awt.Graphics;
-import java.util.ArrayList;
-
 import helpz.LoadSave;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.image.ImageObserver;
+import java.util.ArrayList;
 import main.Game;
 import managers.EnemyManager;
 import managers.TowerManager;
 import objects.PathPoint;
-import objects.Tower;
 import ui.ActionBar;
-import static helpz.Constants.Tiles.GRASS_TILE;
+import objects.Tower;
 
 public class Playing extends GameScene implements SceneMethods {
+    private int[][] lvl;
+    private ActionBar actionBar;
+    private int mouseX;
+    private int mouseY;
+    private EnemyManager enemyManager;
+    private TowerManager towerManager;
+    private PathPoint start;
+    private PathPoint end;
+    private Tower selectedTower;
 
-	private int[][] lvl;
-	private ActionBar actionBar;
-	private int mouseX, mouseY;
-	private EnemyManager enemyManager;
-	private TowerManager towerManager;
-	private PathPoint start, end;
-	private Tower selectedTower;
+    public Playing(Game game) {
+        super(game);
+        this.loadDefaultLevel();
+        this.actionBar = new ActionBar(0, 640, 640, 160, this);
+        this.enemyManager = new EnemyManager(this, this.start, this.end);
+        this.towerManager = new TowerManager(this);
+    }
 
-	public Playing(Game game) {
-		super(game);
-		loadDefaultLevel();
+    private void loadDefaultLevel() {
+        this.lvl = LoadSave.GetLevelData("/new_level.txt");
+        ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("/new_level.txt");
+        this.start = (PathPoint)points.get(0);
+        this.end = (PathPoint)points.get(1);
+    }
 
-		actionBar = new ActionBar(0, 640, 640, 160, this);
-		enemyManager = new EnemyManager(this, start, end);
-		towerManager = new TowerManager(this);
-	}
+    public void setLevel(int[][] lvl) {
+        this.lvl = lvl;
+    }
 
-	private void loadDefaultLevel() {
-		lvl = LoadSave.GetLevelData("new_level");
-		ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("new_level");
-		start = points.get(0);
-		end = points.get(1);
-	}
+    public void update() {
+        this.updateTick();
+        this.enemyManager.update();
+        this.towerManager.update();
+    }
 
-	public void setLevel(int[][] lvl) {
-		this.lvl = lvl;
-	}
+    public void setSelectedTower(Tower selectedTower) {
+        this.selectedTower = selectedTower;
+    }
 
-	public void update() {
-		updateTick();
-		enemyManager.update();
-		towerManager.update();
-	}
+    public void render(Graphics g) {
+        this.drawLevel(g);
+        this.actionBar.draw(g);
+        this.enemyManager.draw(g);
+        this.towerManager.draw(g);
+        this.drawSelectedTower(g);
+        this.drawHighlight(g);
+    }
 
-	public void setSelectedTower(Tower selectedTower) {
-		this.selectedTower = selectedTower;
-	}
+    private void drawHighlight(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.drawRect(this.mouseX, this.mouseY, 32, 32);
+    }
 
-	@Override
-	public void render(Graphics g) {
-		drawLevel(g);
-		actionBar.draw(g);
-		enemyManager.draw(g);
-		towerManager.draw(g);
-		drawSelectedTower(g);
-	}
+    private void drawSelectedTower(Graphics g) {
+        if (this.selectedTower != null) {
+            g.drawImage(this.towerManager.getTowerImgs()[this.selectedTower.getTowerType()], this.mouseX, this.mouseY, (ImageObserver)null);
+        }
 
-	private void drawSelectedTower(Graphics g) {
-		if (selectedTower != null)
-			g.drawImage(towerManager.getTowerImgs()[selectedTower.getTowerType()], mouseX, mouseY, null);
-	}
+    }
 
-	private void drawLevel(Graphics g) {
+    private void drawLevel(Graphics g) {
+        for(int y = 0; y < this.lvl.length; ++y) {
+            for(int x = 0; x < this.lvl[y].length; ++x) {
+                int id = this.lvl[y][x];
+                if (this.isAnimation(id)) {
+                    g.drawImage(this.getSprite(id, this.animationIndex), x * 32, y * 32, (ImageObserver)null);
+                } else {
+                    g.drawImage(this.getSprite(id), x * 32, y * 32, (ImageObserver)null);
+                }
+            }
+        }
 
-		for (int y = 0; y < lvl.length; y++) {
-			for (int x = 0; x < lvl[y].length; x++) {
-				int id = lvl[y][x];
-				if (isAnimation(id)) {
-					g.drawImage(getSprite(id, animationIndex), x * 32, y * 32, null);
-				} else
-					g.drawImage(getSprite(id), x * 32, y * 32, null);
-			}
-		}
-	}
+    }
 
-	public int getTileType(int x, int y) {
-		int xCord = x / 32;
-		int yCord = y / 32;
+    public int getTileType(int x, int y) {
+        int xCord = x / 32;
+        int yCord = y / 32;
+        if (xCord >= 0 && xCord <= 19) {
+            if (yCord >= 0 && yCord <= 19) {
+                int id = this.lvl[y / 32][x / 32];
+                return this.game.getTileManager().getTile(id).getTileType();
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
 
-		if (xCord < 0 || xCord > 19)
-			return 0;
-		if (yCord < 0 || yCord > 19)
-			return 0;
+    public void mouseClicked(int x, int y) {
+        if (y >= 640) {
+            this.actionBar.mouseClicked(x, y);
+        } else if (this.selectedTower != null) {
+            if (this.isTileGrass(this.mouseX, this.mouseY) && this.getTowerAt(this.mouseX, this.mouseY) == null) {
+                this.towerManager.addTower(this.selectedTower, this.mouseX, this.mouseY);
+                this.selectedTower = null;
+            }
+        } else {
+            Tower t = this.getTowerAt(this.mouseX, this.mouseY);
+            this.actionBar.displayTower(t);
+        }
 
-		int id = lvl[y / 32][x / 32];
-		return game.getTileManager().getTile(id).getTileType();
-	}
+    }
 
-	@Override
-	public void mouseClicked(int x, int y) {
-		if (y >= 640)
-			actionBar.mouseClicked(x, y);
-		else {
-			if (selectedTower != null)
-				if (isTileGrass(mouseX, mouseY)) {
-					towerManager.addTower(selectedTower, mouseX, mouseY);
-					selectedTower = null;
-				}
-		}
-	}
+    private Tower getTowerAt(int x, int y) {
+        return this.towerManager.getTowerAt(x, y);
+    }
 
-	private boolean isTileGrass(int x, int y) {
-		int id = lvl[y / 32][x / 32];
-		int tileType = game.getTileManager().getTile(id).getTileType();
-		return tileType == GRASS_TILE;
-	}
+    private boolean isTileGrass(int x, int y) {
+        int id = this.lvl[y / 32][x / 32];
+        int tileType = this.game.getTileManager().getTile(id).getTileType();
+        return tileType == 1;
+    }
 
-	@Override
-	public void mouseMoved(int x, int y) {
-		if (y >= 640)
-			actionBar.mouseMoved(x, y);
-		else {
-			mouseX = (x / 32) * 32;
-			mouseY = (y / 32) * 32;
-		}
-	}
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == 27) {
+            this.selectedTower = null;
+        }
 
-	@Override
-	public void mousePressed(int x, int y) {
-		if (y >= 640) {
-			actionBar.mousePressed(x, y);
-		}
-	}
+    }
 
-	@Override
-	public void mouseReleased(int x, int y) {
-		actionBar.mouseReleased(x, y);
-	}
+    public void mouseMoved(int x, int y) {
+        if (y >= 640) {
+            this.actionBar.mouseMoved(x, y);
+        } else {
+            this.mouseX = x / 32 * 32;
+            this.mouseY = y / 32 * 32;
+        }
 
-	@Override
-	public void mouseDragged(int x, int y) {
+    }
 
-	}
+    public void mousePressed(int x, int y) {
+        if (y >= 640) {
+            this.actionBar.mousePressed(x, y);
+        }
 
-	public TowerManager getTowerManager() {
-		return towerManager;
-	}
+    }
 
+    public void mouseReleased(int x, int y) {
+        this.actionBar.mouseReleased(x, y);
+    }
+
+    public void mouseDragged(int x, int y) {
+    }
+
+    public TowerManager getTowerManager() {
+        return this.towerManager;
+    }
+
+    public EnemyManager getEnemyManger() {
+        return this.enemyManager;
+    }
 }
