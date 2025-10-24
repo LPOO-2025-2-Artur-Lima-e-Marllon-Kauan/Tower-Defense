@@ -12,7 +12,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
-
 import objects.Tower;
 import scenes.Playing;
 
@@ -42,15 +41,18 @@ public class TowerManager {
     }
 
     public void update() {
-        this.attackEnemyIfClose();
+        for(Tower t : this.towers) {
+            t.update();
+            this.attackEnemyIfClose(t);
+        }
+
     }
 
-    private void attackEnemyIfClose() {
-        for(Tower t : this.towers) {
-            for(Enemy e : this.playing.getEnemyManger().getEnemies()) {
-                if (e.isAlive() && this.isEnemyInRange(t, e)) {
-                    e.hurt(1);
-                }
+    private void attackEnemyIfClose(Tower t) {
+        for(Enemy e : this.playing.getEnemyManger().getEnemies()) {
+            if (e.isAlive() && this.isEnemyInRange(t, e) && t.isCooldownOver()) {
+                this.playing.shootEnemy(t, e);
+                t.resetCooldown();
             }
         }
 

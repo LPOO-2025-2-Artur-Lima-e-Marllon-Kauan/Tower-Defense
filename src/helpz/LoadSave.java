@@ -1,18 +1,25 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package helpz;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import objects.PathPoint;
 
 public class LoadSave {
-
-    // Carrega o sprite atlas
     public static BufferedImage getSpriteAtlas() {
         BufferedImage img = null;
-        InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("res/spriteatlas.png");
+        InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("spriteatlas.png");
 
         try {
             img = ImageIO.read(is);
@@ -23,26 +30,19 @@ public class LoadSave {
         return img;
     }
 
-    // Cria arquivo de teste
     public static void CreateFile() {
-        File dir = new File(System.getProperty("user.dir"), "res");
-        if (!dir.exists()) dir.mkdirs();
+        File txtFile = new File("res/testTextFile.txt");
 
-        File txtFile = new File(dir, "testTextFile.txt");
         try {
             txtFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    // Cria um novo nível
     public static void CreateLevel(String name, int[] idArr) {
-        File dir = new File(System.getProperty("user.dir"), "res");
-        if (!dir.exists()) dir.mkdirs();
-
-        File newLevel = new File(dir, name + ".txt");
-
+        File newLevel = new File("res/" + name + ".txt");
         if (newLevel.exists()) {
             System.out.println("File: " + name + " already exists!");
         } else {
@@ -52,99 +52,81 @@ public class LoadSave {
                 e.printStackTrace();
             }
 
-            // Escreve IDs e start/end padrão
             WriteToFile(newLevel, idArr, new PathPoint(0, 0), new PathPoint(0, 0));
         }
     }
 
-    // Salva o nível existente
-    public static void SaveLevel(String name, int[][] idArr, PathPoint start, PathPoint end) {
-        File dir = new File(System.getProperty("user.dir"), "res");
-        File levelFile = new File(dir, name + ".txt");
-
-        if (levelFile.exists()) {
-            WriteToFile(levelFile, Utilz.TwoDto1DintArr(idArr), start, end);
-        } else {
-            System.out.println("File: " + name + " does not exist!");
-        }
-    }
-
-    // Escreve IDs e pontos no arquivo
     private static void WriteToFile(File f, int[] idArr, PathPoint start, PathPoint end) {
-        try (PrintWriter pw = new PrintWriter(f)) {
-            for (int i : idArr) {
+        try {
+            PrintWriter pw = new PrintWriter(f);
+            int[] var8 = idArr;
+            int var7 = idArr.length;
+
+            for(int var6 = 0; var6 < var7; ++var6) {
+                Integer i = var8[var6];
                 pw.println(i);
             }
-            // Start e End no final do arquivo
+
             pw.println(start.getxCord());
             pw.println(start.getyCord());
             pw.println(end.getxCord());
             pw.println(end.getyCord());
+            pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    public static void SaveLevel(String name, int[][] idArr, PathPoint start, PathPoint end) {
+        File levelFile = new File("res/" + name + ".txt");
+        if (levelFile.exists()) {
+            WriteToFile(levelFile, Utilz.TwoDto1DintArr(idArr), start, end);
+        } else {
+            System.out.println("File: " + name + " does not exists! ");
         }
     }
 
-    // Lê todos os números de um arquivo
     private static ArrayList<Integer> ReadFromFile(File file) {
-        ArrayList<Integer> list = new ArrayList<>();
-        try (Scanner sc = new Scanner(file)) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine().trim();
-                if (!line.isEmpty()) {
-                    list.add(Integer.parseInt(line));
-                }
+        ArrayList<Integer> list = new ArrayList();
+
+        try {
+            Scanner sc = new Scanner(file);
+
+            while(sc.hasNextLine()) {
+                list.add(Integer.parseInt(sc.nextLine()));
             }
+
+            sc.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
-    // Retorna os pontos start e end do nível
     public static ArrayList<PathPoint> GetLevelPathPoints(String name) {
-        File dir = new File(System.getProperty("user.dir"), "res");
-        File lvlFile = new File(dir, name + ".txt");
-        ArrayList<PathPoint> points = new ArrayList<>();
-
-        if (!lvlFile.exists()) {
-            System.out.println("File: " + name + " does not exist! Using default points");
-            points.add(new PathPoint(0, 0));
-            points.add(new PathPoint(0, 0));
+        File lvlFile = new File("res/" + name + ".txt");
+        if (lvlFile.exists()) {
+            ArrayList<Integer> list = ReadFromFile(lvlFile);
+            ArrayList<PathPoint> points = new ArrayList();
+            points.add(new PathPoint((Integer)list.get(400), (Integer)list.get(401)));
+            points.add(new PathPoint((Integer)list.get(402), (Integer)list.get(403)));
             return points;
-        }
-
-        ArrayList<Integer> list = ReadFromFile(lvlFile);
-
-        if (list.size() >= 4) {
-            int size = list.size();
-            int startX = list.get(size - 4);
-            int startY = list.get(size - 3);
-            int endX = list.get(size - 2);
-            int endY = list.get(size - 1);
-
-            points.add(new PathPoint(startX, startY));
-            points.add(new PathPoint(endX, endY));
         } else {
-            System.out.println("⚠️ File " + name + " does not have enough points, using default");
-            points.add(new PathPoint(0, 0));
-            points.add(new PathPoint(0, 0));
+            System.out.println("File: " + name + " does not exists! ");
+            return null;
         }
-
-        return points;
     }
 
-    // Retorna os dados do nível como matriz 2D
     public static int[][] GetLevelData(String name) {
-        File dir = new File(System.getProperty("user.dir"), "res");
-        File lvlFile = new File(dir, name + ".txt");
-
-        if (!lvlFile.exists()) {
-            System.out.println("File: " + name + " does not exist! Returning empty level");
-            return new int[20][20]; // Retorna matriz vazia
+        File lvlFile = new File("res/" + name + ".txt");
+        if (lvlFile.exists()) {
+            ArrayList<Integer> list = ReadFromFile(lvlFile);
+            return Utilz.ArrayListTo2Dint(list, 20, 20);
+        } else {
+            System.out.println("File: " + name + " does not exists! ");
+            return null;
         }
-
-        ArrayList<Integer> list = ReadFromFile(lvlFile);
-        return Utilz.ArrayListTo2Dint(list, 20, 20);
     }
 }

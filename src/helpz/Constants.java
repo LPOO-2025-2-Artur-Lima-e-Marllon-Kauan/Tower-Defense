@@ -51,19 +51,19 @@ public class Constants {
             }
         }
 
-        public static float GetStartDmg(int towerType) {
+        public static int GetStartDmg(int towerType) {
             switch (towerType) {
                 case 0 -> {
-                    return 25.0F;
+                    return 25;
                 }
                 case 1 -> {
-                    return 15.0F;
+                    return 10;
                 }
                 case 2 -> {
-                    return 5.0F;
+                    return 5;
                 }
                 default -> {
-                    return 0.0F;
+                    return 0;
                 }
             }
         }

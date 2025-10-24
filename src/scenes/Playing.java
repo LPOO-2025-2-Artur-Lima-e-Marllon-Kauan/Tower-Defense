@@ -5,6 +5,7 @@
 
 package scenes;
 
+import enemies.Enemy;
 import helpz.LoadSave;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,10 +14,11 @@ import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import main.Game;
 import managers.EnemyManager;
+import managers.ProjectileManager;
 import managers.TowerManager;
 import objects.PathPoint;
-import ui.ActionBar;
 import objects.Tower;
+import ui.ActionBar;
 
 public class Playing extends GameScene implements SceneMethods {
     private int[][] lvl;
@@ -25,6 +27,7 @@ public class Playing extends GameScene implements SceneMethods {
     private int mouseY;
     private EnemyManager enemyManager;
     private TowerManager towerManager;
+    private ProjectileManager projManager;
     private PathPoint start;
     private PathPoint end;
     private Tower selectedTower;
@@ -35,6 +38,7 @@ public class Playing extends GameScene implements SceneMethods {
         this.actionBar = new ActionBar(0, 640, 640, 160, this);
         this.enemyManager = new EnemyManager(this, this.start, this.end);
         this.towerManager = new TowerManager(this);
+        this.projManager = new ProjectileManager(this);
     }
 
     private void loadDefaultLevel() {
@@ -52,6 +56,7 @@ public class Playing extends GameScene implements SceneMethods {
         this.updateTick();
         this.enemyManager.update();
         this.towerManager.update();
+        this.projManager.update();
     }
 
     public void setSelectedTower(Tower selectedTower) {
@@ -63,6 +68,7 @@ public class Playing extends GameScene implements SceneMethods {
         this.actionBar.draw(g);
         this.enemyManager.draw(g);
         this.towerManager.draw(g);
+        this.projManager.draw(g);
         this.drawSelectedTower(g);
         this.drawHighlight(g);
     }
@@ -170,5 +176,9 @@ public class Playing extends GameScene implements SceneMethods {
 
     public EnemyManager getEnemyManger() {
         return this.enemyManager;
+    }
+
+    public void shootEnemy(Tower t, Enemy e) {
+        this.projManager.newProjectile(t, e);
     }
 }

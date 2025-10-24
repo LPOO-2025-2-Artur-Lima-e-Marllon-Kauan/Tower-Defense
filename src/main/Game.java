@@ -13,7 +13,6 @@ import scenes.Editing;
 import scenes.Menu;
 import scenes.Playing;
 import scenes.Settings;
-import objects.PathPoint;
 
 public class Game extends JFrame implements Runnable {
     private GameScreen gameScreen;
@@ -39,24 +38,13 @@ public class Game extends JFrame implements Runnable {
     }
 
     private void createDefaultLevel() {
-        // Ensure file exists
-        int[] placeholder = new int[400];
-        for (int i = 0; i < placeholder.length; i++) placeholder[i] = 0; // Grass
-        LoadSave.CreateLevel("new_level", placeholder);
+        int[] arr = new int[400];
 
-        // Build a simple straight road path across row 10
-        int[][] lvl = new int[20][20];
-        for (int y = 0; y < 20; y++) {
-            for (int x = 0; x < 20; x++) {
-                lvl[y][x] = 0; // GRASS id
-            }
-        }
-        for (int x = 0; x < 20; x++) {
-            lvl[10][x] = 2; // ROAD_LR id
+        for(int i = 0; i < arr.length; ++i) {
+            arr[i] = 0;
         }
 
-        // Save level with meaningful start/end on the road
-        LoadSave.SaveLevel("new_level", lvl, new PathPoint(0, 10), new PathPoint(19, 10));
+        LoadSave.CreateLevel("new_level", arr);
     }
 
     private void initClasses() {

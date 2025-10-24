@@ -51,6 +51,12 @@ public abstract class Enemy {
             case 3 -> this.y += speed;
         }
 
+        this.updateHitbox();
+    }
+
+    private void updateHitbox() {
+        this.bounds.x = (int)this.x;
+        this.bounds.y = (int)this.y;
     }
 
     public void setPos(int x, int y) {

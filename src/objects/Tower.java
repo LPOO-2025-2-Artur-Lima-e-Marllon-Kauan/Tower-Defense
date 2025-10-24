@@ -12,7 +12,8 @@ public class Tower {
     private int y;
     private int id;
     private int towerType;
-    private float dmg;
+    private int cdTick;
+    private int dmg;
     private float range;
     private float cooldown;
 
@@ -24,6 +25,18 @@ public class Tower {
         this.setDefaultDmg();
         this.setDefaultRange();
         this.setDefaultCooldown();
+    }
+
+    public void update() {
+        ++this.cdTick;
+    }
+
+    public boolean isCooldownOver() {
+        return (float)this.cdTick >= this.cooldown;
+    }
+
+    public void resetCooldown() {
+        this.cdTick = 0;
     }
 
     private void setDefaultCooldown() {
@@ -70,7 +83,7 @@ public class Tower {
         this.towerType = towerType;
     }
 
-    public float getDmg() {
+    public int getDmg() {
         return this.dmg;
     }
 

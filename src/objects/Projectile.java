@@ -11,19 +11,27 @@ public class Projectile {
     private Point2D.Float pos;
     private int id;
     private int projectileType;
+    private int dmg;
+    private float xSpeed;
+    private float ySpeed;
+    private float rotation;
     private boolean active = true;
 
-    public Projectile(float x, float y, int id, int projectileType) {
+    public Projectile(float x, float y, float xSpeed, float ySpeed, int dmg, float rotation, int id, int projectileType) {
         this.pos = new Point2D.Float(x, y);
+        this.xSpeed = xSpeed;
+        this.ySpeed = ySpeed;
+        this.dmg = dmg;
+        this.rotation = rotation;
         this.id = id;
         this.projectileType = projectileType;
     }
 
-    public void move(float x, float y) {
+    public void move() {
         Point2D.Float var10000 = this.pos;
-        var10000.x += x;
+        var10000.x += this.xSpeed;
         var10000 = this.pos;
-        var10000.y += y;
+        var10000.y += this.ySpeed;
     }
 
     public Point2D.Float getPos() {
@@ -48,5 +56,13 @@ public class Projectile {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public int getDmg() {
+        return this.dmg;
+    }
+
+    public float getRotation() {
+        return this.rotation;
     }
 }

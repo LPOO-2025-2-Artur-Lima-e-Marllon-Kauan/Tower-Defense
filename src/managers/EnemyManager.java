@@ -67,9 +67,7 @@ public class EnemyManager {
         int newY = (int)(e.getY() + this.getSpeedAndHeight(e.getLastDir(), e.getEnemyType()));
         if (this.getTileType(newX, newY) == 2) {
             e.move(Enemies.GetSpeed(e.getEnemyType()), e.getLastDir());
-        } else if (this.isAtEnd(e)) {
-            System.out.println("Lives Lost!");
-        } else {
+        } else if (!this.isAtEnd(e)) {
             this.setNewDirectionAndMove(e);
         }
 
