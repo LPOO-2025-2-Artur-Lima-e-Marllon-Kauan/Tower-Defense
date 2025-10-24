@@ -50,12 +50,35 @@ public class EnemyManager {
     }
 
     public void update() {
+        updateWaveManager();
+
+        if(isTimeForNewEnemy()){
+            spawnEnemy();
+        }
+
         for(Enemy e : this.enemies) {
             if (e.isAlive()) {
                 this.updateEnemyMove(e);
             }
         }
 
+    }
+
+    private void updateWaveManager() {
+        playing.getWaveManager().update();
+    }
+
+    private void spawnEnemy() {
+        addEnemy(playing.getWaveManager().getNextEnemy());
+    }
+
+    private boolean isTimeForNewEnemy() {
+        if(playing.getWaveManager().isTimeForNewEnemy()){
+            if(playing.getWaveManager().isThereMoreWaves())
+                return true;
+        }
+
+        return false;
     }
 
     public void updateEnemyMove(Enemy e) {

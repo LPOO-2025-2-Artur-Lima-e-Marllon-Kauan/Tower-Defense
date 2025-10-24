@@ -58,6 +58,12 @@
       <place><![CDATA[psiMethod().withName("value").withParameters().definedInClass("org.apache.ibatis.annotations.Update")]]></place>
     </injection>
     <injection language="SQL" injector-id="java">
+      <display-name>QueryProducer (org.hibernate.query)</display-name>
+      <single-file value="true" />
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createNativeQuery").definedInClass("org.hibernate.query.QueryProducer"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createSQLQuery").definedInClass("org.hibernate.query.QueryProducer"))]]></place>
+    </injection>
+    <injection language="SQL" injector-id="java">
       <display-name>QueryRunner (org.apache.commons.dbutils)</display-name>
       <single-file value="true" />
       <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("batch").withParameterCount(2).definedInClass("org.apache.commons.dbutils.QueryRunner"))]]></place>
@@ -101,6 +107,24 @@
       <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("header", "getHeader", "headers").definedInClass("io.restassured.response.ResponseOptions"))]]></place>
       <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("header", "getHeader", "headers").definedInClass("io.restassured.response.ValidatableResponseOptions"))]]></place>
       <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("header", "headers").definedInClass("io.restassured.specification.RequestSpecification"))]]></place>
+    </injection>
+    <injection language="SQL" injector-id="java">
+      <display-name>Session.createNativeQuery (org.hibernate)</display-name>
+      <single-file value="true" />
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createNativeQuery").definedInClass("org.hibernate.reactive.mutiny.Mutiny.Session"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createNativeQuery").definedInClass("org.hibernate.reactive.mutiny.Mutiny.StatelessSession"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createNativeQuery").definedInClass("org.hibernate.reactive.stage.Stage.Session"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createNativeQuery").definedInClass("org.hibernate.reactive.stage.Stage.StatelessSession"))]]></place>
+    </injection>
+    <injection language="HQL" injector-id="java">
+      <display-name>Session.createQuery (org.hibernate)</display-name>
+      <single-file value="true" />
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("org.hibernate.Session"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("org.hibernate.reactive.mutiny.Mutiny.Session"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("org.hibernate.reactive.mutiny.Mutiny.StatelessSession"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("org.hibernate.reactive.stage.Stage.Session"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("org.hibernate.reactive.stage.Stage.StatelessSession"))]]></place>
+      <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery", "createSelectionQuery", "createMutationQuery").definedInClass("org.hibernate.query.QueryProducer"))]]></place>
     </injection>
     <injection language="SQL" injector-id="java">
       <display-name>SmallRye Axle SqlClient (io.vertx.axle.sqlclient)</display-name>

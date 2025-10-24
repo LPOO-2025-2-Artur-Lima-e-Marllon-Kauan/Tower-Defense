@@ -16,6 +16,7 @@ import main.Game;
 import managers.EnemyManager;
 import managers.ProjectileManager;
 import managers.TowerManager;
+import managers.WaveManager;
 import objects.PathPoint;
 import objects.Tower;
 import ui.ActionBar;
@@ -31,6 +32,7 @@ public class Playing extends GameScene implements SceneMethods {
     private PathPoint start;
     private PathPoint end;
     private Tower selectedTower;
+    private WaveManager waveManager;
 
     public Playing(Game game) {
         super(game);
@@ -39,6 +41,7 @@ public class Playing extends GameScene implements SceneMethods {
         this.enemyManager = new EnemyManager(this, this.start, this.end);
         this.towerManager = new TowerManager(this);
         this.projManager = new ProjectileManager(this);
+        this.waveManager = new WaveManager(this);
     }
 
     private void loadDefaultLevel() {
@@ -177,6 +180,8 @@ public class Playing extends GameScene implements SceneMethods {
     public EnemyManager getEnemyManger() {
         return this.enemyManager;
     }
+
+    public WaveManager getWaveManager() { return this.waveManager; }
 
     public void shootEnemy(Tower t, Enemy e) {
         this.projManager.newProjectile(t, e);
