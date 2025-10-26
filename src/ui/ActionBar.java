@@ -68,6 +68,7 @@ public class ActionBar extends Bar {
         this.drawDisplayedTower(g);
         this.drawWaveInfo(g);
         this.drawGoldAmount(g);
+        this.drawLives(g);
         if (this.showTowerCost) {
             this.drawTowerCost(g);
         }
@@ -102,6 +103,11 @@ public class ActionBar extends Bar {
 
     private void drawGoldAmount(Graphics g) {
         g.drawString("Gold: " + this.gold + "g", 110, 725);
+    }
+
+    private void drawLives(Graphics g) {
+        g.setColor(Color.black);
+        g.drawString("Lives: " + this.playing.getLives(), 350, 725);
     }
 
     private void drawWaveInfo(Graphics g) {

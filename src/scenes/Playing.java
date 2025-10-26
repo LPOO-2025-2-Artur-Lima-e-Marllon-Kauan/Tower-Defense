@@ -35,6 +35,7 @@ public class Playing extends GameScene implements SceneMethods {
     private PathPoint end;
     private Tower selectedTower;
     private int goldTick;
+    private int lives = 2;
 
     public Playing(Game game) {
         super(game);
@@ -239,8 +240,14 @@ public class Playing extends GameScene implements SceneMethods {
 
     // Called when an enemy reaches the end of the path
     public void enemyEscaped() {
-        // On first escape, the player loses the game
-        main.GameStates.SetGameState(main.GameStates.MENU);
+        this.lives--;
+        if (this.lives <= 0) {
+            main.GameStates.SetGameState(main.GameStates.MENU);
+        }
+    }
+
+    public int getLives() {
+        return this.lives;
     }
 
     public TowerManager getTowerManager() {
