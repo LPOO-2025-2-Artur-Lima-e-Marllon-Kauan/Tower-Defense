@@ -27,17 +27,19 @@ public class EnemyManager {
     private PathPoint start;
     private PathPoint end;
     private int HPbarWidth = 20;
+    private BufferedImage slowEffect;
 
     public EnemyManager(Playing playing, PathPoint start, PathPoint end) {
         this.playing = playing;
         this.enemyImgs = new BufferedImage[4];
         this.start = start;
         this.end = end;
-        this.addEnemy(0);
-        this.addEnemy(1);
-        this.addEnemy(2);
-        this.addEnemy(3);
+        this.loadEffectImg();
         this.loadEnemyImgs();
+    }
+
+    private void loadEffectImg() {
+        this.slowEffect = LoadSave.getSpriteAtlas().getSubimage(288, 64, 32, 32);
     }
 
     private void loadEnemyImgs() {
@@ -50,12 +52,6 @@ public class EnemyManager {
     }
 
     public void update() {
-        updateWaveManager();
-
-        if(isTimeForNewEnemy()){
-            spawnEnemy();
-        }
-
         for(Enemy e : this.enemies) {
             if (e.isAlive()) {
                 this.updateEnemyMove(e);
@@ -64,33 +60,23 @@ public class EnemyManager {
 
     }
 
-    private void updateWaveManager() {
-        playing.getWaveManager().update();
-    }
-
-    private void spawnEnemy() {
-        addEnemy(playing.getWaveManager().getNextEnemy());
-    }
-
-    private boolean isTimeForNewEnemy() {
-        if(playing.getWaveManager().isTimeForNewEnemy()){
-            if(playing.getWaveManager().isThereMoreWaves())
-                return true;
-        }
-
-        return false;
-    }
-
     public void updateEnemyMove(Enemy e) {
         if (e.getLastDir() == -1) {
             this.setNewDirectionAndMove(e);
+        }
+
+        // Prioritize checking end condition to avoid looping at the end of the path
+        if (this.isAtEnd(e)) {
+            e.kill();
+            this.playing.enemyEscaped();
+            return;
         }
 
         int newX = (int)(e.getX() + this.getSpeedAndWidth(e.getLastDir(), e.getEnemyType()));
         int newY = (int)(e.getY() + this.getSpeedAndHeight(e.getLastDir(), e.getEnemyType()));
         if (this.getTileType(newX, newY) == 2) {
             e.move(Enemies.GetSpeed(e.getEnemyType()), e.getLastDir());
-        } else if (!this.isAtEnd(e)) {
+        } else {
             this.setNewDirectionAndMove(e);
         }
 
@@ -138,7 +124,9 @@ public class EnemyManager {
     }
 
     private boolean isAtEnd(Enemy e) {
-        return e.getX() == (float)(this.end.getxCord() * 32) && e.getY() == (float)(this.end.getyCord() * 32);
+        int xCord = (int)(e.getX() / 32.0f);
+        int yCord = (int)(e.getY() / 32.0f);
+        return xCord == this.end.getxCord() && yCord == this.end.getyCord();
     }
 
     private int getTileType(int x, int y) {
@@ -161,14 +149,18 @@ public class EnemyManager {
         }
     }
 
+    public void spawnEnemy(int nextEnemy) {
+        this.addEnemy(nextEnemy);
+    }
+
     public void addEnemy(int enemyType) {
         int x = this.start.getxCord() * 32;
         int y = this.start.getyCord() * 32;
         switch (enemyType) {
-            case 0 -> this.enemies.add(new Orc((float)x, (float)y, 0));
-            case 1 -> this.enemies.add(new Bat((float)x, (float)y, 0));
-            case 2 -> this.enemies.add(new Knight((float)x, (float)y, 0));
-            case 3 -> this.enemies.add(new Wolf((float)x, (float)y, 0));
+            case 0 -> this.enemies.add(new Orc((float)x, (float)y, 0, this));
+            case 1 -> this.enemies.add(new Bat((float)x, (float)y, 0, this));
+            case 2 -> this.enemies.add(new Knight((float)x, (float)y, 0, this));
+            case 3 -> this.enemies.add(new Wolf((float)x, (float)y, 0, this));
         }
 
     }
@@ -178,7 +170,15 @@ public class EnemyManager {
             if (e.isAlive()) {
                 this.drawEnemy(e, g);
                 this.drawHealthBar(e, g);
+                this.drawEffects(e, g);
             }
+        }
+
+    }
+
+    private void drawEffects(Enemy e, Graphics g) {
+        if (e.isSlowed()) {
+            g.drawImage(this.slowEffect, (int)e.getX(), (int)e.getY(), (ImageObserver)null);
         }
 
     }
@@ -198,5 +198,21 @@ public class EnemyManager {
 
     public ArrayList<Enemy> getEnemies() {
         return this.enemies;
+    }
+
+    public int getAmountOfAliveEnemies() {
+        int size = 0;
+
+        for(Enemy e : this.enemies) {
+            if (e.isAlive()) {
+                ++size;
+            }
+        }
+
+        return size;
+    }
+
+    public void rewardPlayer(int enemyType) {
+        this.playing.rewardPlayer(enemyType);
     }
 }

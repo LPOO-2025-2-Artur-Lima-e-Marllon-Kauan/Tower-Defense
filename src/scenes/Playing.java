@@ -7,6 +7,7 @@ package scenes;
 
 import enemies.Enemy;
 import helpz.LoadSave;
+import helpz.Constants.Enemies;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -29,10 +30,11 @@ public class Playing extends GameScene implements SceneMethods {
     private EnemyManager enemyManager;
     private TowerManager towerManager;
     private ProjectileManager projManager;
+    private WaveManager waveManager;
     private PathPoint start;
     private PathPoint end;
     private Tower selectedTower;
-    private WaveManager waveManager;
+    private int goldTick;
 
     public Playing(Game game) {
         super(game);
@@ -57,9 +59,58 @@ public class Playing extends GameScene implements SceneMethods {
 
     public void update() {
         this.updateTick();
+        this.waveManager.update();
+        ++this.goldTick;
+        if (this.goldTick % 180 == 0) {
+            this.actionBar.addGold(1);
+        }
+
+        if (this.isAllEnemiesDead() && this.isThereMoreWaves()) {
+            this.waveManager.startWaveTimer();
+            if (this.isWaveTimerOver()) {
+                this.waveManager.increaseWaveIndex();
+                this.enemyManager.getEnemies().clear();
+                this.waveManager.resetEnemyIndex();
+            }
+        }
+
+        if (this.isTimeForNewEnemy()) {
+            this.spawnEnemy();
+        }
+
         this.enemyManager.update();
         this.towerManager.update();
         this.projManager.update();
+    }
+
+    private boolean isWaveTimerOver() {
+        return this.waveManager.isWaveTimerOver();
+    }
+
+    private boolean isThereMoreWaves() {
+        return this.waveManager.isThereMoreWaves();
+    }
+
+    private boolean isAllEnemiesDead() {
+        if (this.waveManager.isThereMoreEnemiesInWave()) {
+            return false;
+        } else {
+            for(Enemy e : this.enemyManager.getEnemies()) {
+                if (e.isAlive()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private void spawnEnemy() {
+        this.enemyManager.spawnEnemy(this.waveManager.getNextEnemy());
+    }
+
+    private boolean isTimeForNewEnemy() {
+        return this.waveManager.isTimeForNewEnemy() && this.waveManager.isThereMoreEnemiesInWave();
     }
 
     public void setSelectedTower(Tower selectedTower) {
@@ -123,6 +174,7 @@ public class Playing extends GameScene implements SceneMethods {
         } else if (this.selectedTower != null) {
             if (this.isTileGrass(this.mouseX, this.mouseY) && this.getTowerAt(this.mouseX, this.mouseY) == null) {
                 this.towerManager.addTower(this.selectedTower, this.mouseX, this.mouseY);
+                this.removeGold(this.selectedTower.getTowerType());
                 this.selectedTower = null;
             }
         } else {
@@ -130,6 +182,10 @@ public class Playing extends GameScene implements SceneMethods {
             this.actionBar.displayTower(t);
         }
 
+    }
+
+    private void removeGold(int towerType) {
+        this.actionBar.payForTower(towerType);
     }
 
     private Tower getTowerAt(int x, int y) {
@@ -140,6 +196,10 @@ public class Playing extends GameScene implements SceneMethods {
         int id = this.lvl[y / 32][x / 32];
         int tileType = this.game.getTileManager().getTile(id).getTileType();
         return tileType == 1;
+    }
+
+    public void shootEnemy(Tower t, Enemy e) {
+        this.projManager.newProjectile(t, e);
     }
 
     public void keyPressed(KeyEvent e) {
@@ -173,6 +233,16 @@ public class Playing extends GameScene implements SceneMethods {
     public void mouseDragged(int x, int y) {
     }
 
+    public void rewardPlayer(int enemyType) {
+        this.actionBar.addGold(Enemies.GetReward(enemyType));
+    }
+
+    // Called when an enemy reaches the end of the path
+    public void enemyEscaped() {
+        // On first escape, the player loses the game
+        main.GameStates.SetGameState(main.GameStates.MENU);
+    }
+
     public TowerManager getTowerManager() {
         return this.towerManager;
     }
@@ -181,9 +251,7 @@ public class Playing extends GameScene implements SceneMethods {
         return this.enemyManager;
     }
 
-    public WaveManager getWaveManager() { return this.waveManager; }
-
-    public void shootEnemy(Tower t, Enemy e) {
-        this.projManager.newProjectile(t, e);
+    public WaveManager getWaveManager() {
+        return this.waveManager;
     }
 }

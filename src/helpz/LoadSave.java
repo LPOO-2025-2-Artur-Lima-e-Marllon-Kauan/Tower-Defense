@@ -19,7 +19,7 @@ import objects.PathPoint;
 public class LoadSave {
     public static BufferedImage getSpriteAtlas() {
         BufferedImage img = null;
-        InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("spriteatlas.png");
+        InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("res/spriteatlas.png");
 
         try {
             img = ImageIO.read(is);

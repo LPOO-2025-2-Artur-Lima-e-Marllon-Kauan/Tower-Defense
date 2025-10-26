@@ -5,8 +5,10 @@
 
 package enemies;
 
+import managers.EnemyManager;
+
 public class Orc extends Enemy {
-    public Orc(float x, float y, int ID) {
-        super(x, y, ID, 0);
+    public Orc(float x, float y, int ID, EnemyManager em) {
+        super(x, y, ID, 0, em);
     }
 }

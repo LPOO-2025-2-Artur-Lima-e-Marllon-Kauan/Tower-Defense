@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.ImageObserver;
+import java.text.DecimalFormat;
 import main.GameStates;
 import objects.Tower;
 import scenes.Playing;
@@ -20,10 +21,15 @@ public class ActionBar extends Bar {
     private MyButton[] towerButtons;
     private Tower selectedTower;
     private Tower displayedTower;
+    private DecimalFormat formatter;
+    private int gold = 100;
+    private boolean showTowerCost;
+    private int towerCostType;
 
     public ActionBar(int x, int y, int width, int height, Playing playing) {
         super(x, y, width, height);
         this.playing = playing;
+        this.formatter = new DecimalFormat("0.0");
         this.initButtons();
     }
 
@@ -60,6 +66,70 @@ public class ActionBar extends Bar {
         g.fillRect(this.x, this.y, this.width, this.height);
         this.drawButtons(g);
         this.drawDisplayedTower(g);
+        this.drawWaveInfo(g);
+        this.drawGoldAmount(g);
+        if (this.showTowerCost) {
+            this.drawTowerCost(g);
+        }
+
+    }
+
+    private void drawTowerCost(Graphics g) {
+        g.setColor(Color.gray);
+        g.fillRect(280, 650, 120, 50);
+        g.setColor(Color.black);
+        g.drawRect(280, 650, 120, 50);
+        g.drawString(this.getTowerCostName(), 285, 670);
+        g.drawString("Cost: " + this.getTowerCostCost() + "g", 285, 695);
+        if (this.isTowerCostMoreThanCurrentGold()) {
+            g.setColor(Color.RED);
+            g.drawString("Can't Afford", 270, 725);
+        }
+
+    }
+
+    private boolean isTowerCostMoreThanCurrentGold() {
+        return this.getTowerCostCost() > this.gold;
+    }
+
+    private String getTowerCostName() {
+        return Towers.GetName(this.towerCostType);
+    }
+
+    private int getTowerCostCost() {
+        return Towers.GetTowerCost(this.towerCostType);
+    }
+
+    private void drawGoldAmount(Graphics g) {
+        g.drawString("Gold: " + this.gold + "g", 110, 725);
+    }
+
+    private void drawWaveInfo(Graphics g) {
+        g.setColor(Color.black);
+        g.setFont(new Font("LucidaSans", 1, 20));
+        this.drawWaveTimerInfo(g);
+        this.drawEnemiesLeftInfo(g);
+        this.drawWavesLeftInfo(g);
+    }
+
+    private void drawWavesLeftInfo(Graphics g) {
+        int current = this.playing.getWaveManager().getWaveIndex();
+        int size = this.playing.getWaveManager().getWaves().size();
+        g.drawString("Wave " + (current + 1) + " / " + size, 425, 770);
+    }
+
+    private void drawEnemiesLeftInfo(Graphics g) {
+        int remaining = this.playing.getEnemyManger().getAmountOfAliveEnemies();
+        g.drawString("Enemies Left: " + remaining, 425, 790);
+    }
+
+    private void drawWaveTimerInfo(Graphics g) {
+        if (this.playing.getWaveManager().isWaveTimerStarted()) {
+            float timeLeft = this.playing.getWaveManager().getTimeLeft();
+            String formattedText = this.formatter.format((double)timeLeft);
+            g.drawString("Time Left: " + formattedText, 425, 750);
+        }
+
     }
 
     private void drawDisplayedTower(Graphics g) {
@@ -100,6 +170,10 @@ public class ActionBar extends Bar {
             MyButton[] var6;
             for(MyButton b : var6 = this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
+                    if (!this.isGoldEnoughForTower(b.getId())) {
+                        return;
+                    }
+
                     this.selectedTower = new Tower(0, 0, -1, b.getId());
                     this.playing.setSelectedTower(this.selectedTower);
                     return;
@@ -109,8 +183,13 @@ public class ActionBar extends Bar {
 
     }
 
+    private boolean isGoldEnoughForTower(int towerType) {
+        return this.gold >= Towers.GetTowerCost(towerType);
+    }
+
     public void mouseMoved(int x, int y) {
         this.bMenu.setMouseOver(false);
+        this.showTowerCost = false;
 
         MyButton[] var6;
         for(MyButton b : var6 = this.towerButtons) {
@@ -123,6 +202,8 @@ public class ActionBar extends Bar {
             for(MyButton b : var6 = this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
                     b.setMouseOver(true);
+                    this.showTowerCost = true;
+                    this.towerCostType = b.getId();
                     return;
                 }
             }
@@ -153,5 +234,13 @@ public class ActionBar extends Bar {
             b.resetBooleans();
         }
 
+    }
+
+    public void payForTower(int towerType) {
+        this.gold -= Towers.GetTowerCost(towerType);
+    }
+
+    public void addGold(int getReward) {
+        this.gold += getReward;
     }
 }

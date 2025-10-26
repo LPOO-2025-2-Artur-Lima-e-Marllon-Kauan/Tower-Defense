@@ -7,8 +7,10 @@ package enemies;
 
 import helpz.Constants.Enemies;
 import java.awt.Rectangle;
+import managers.EnemyManager;
 
 public abstract class Enemy {
+    protected EnemyManager enemyManager;
     protected float x;
     protected float y;
     protected Rectangle bounds;
@@ -18,12 +20,16 @@ public abstract class Enemy {
     protected int enemyType;
     protected int lastDir;
     protected boolean alive = true;
+    protected int slowTickLimit = 120;
+    protected int slowTick;
 
-    public Enemy(float x, float y, int ID, int enemyType) {
+    public Enemy(float x, float y, int ID, int enemyType, EnemyManager enemyManager) {
+        this.slowTick = this.slowTickLimit;
         this.x = x;
         this.y = y;
         this.ID = ID;
         this.enemyType = enemyType;
+        this.enemyManager = enemyManager;
         this.bounds = new Rectangle((int)x, (int)y, 32, 32);
         this.lastDir = -1;
         this.setStartHealth();
@@ -38,12 +44,27 @@ public abstract class Enemy {
         this.health -= dmg;
         if (this.health <= 0) {
             this.alive = false;
+            this.enemyManager.rewardPlayer(this.enemyType);
         }
 
     }
 
+    public void kill() {
+        this.alive = false;
+        this.health = 0;
+    }
+
+    public void slow() {
+        this.slowTick = 0;
+    }
+
     public void move(float speed, int dir) {
         this.lastDir = dir;
+        if (this.slowTick < this.slowTickLimit) {
+            ++this.slowTick;
+            speed *= 0.5F;
+        }
+
         switch (dir) {
             case 0 -> this.x -= speed;
             case 1 -> this.y -= speed;
@@ -98,5 +119,9 @@ public abstract class Enemy {
 
     public boolean isAlive() {
         return this.alive;
+    }
+
+    public boolean isSlowed() {
+        return this.slowTick < this.slowTickLimit;
     }
 }

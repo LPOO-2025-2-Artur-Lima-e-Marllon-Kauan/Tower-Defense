@@ -5,8 +5,10 @@
 
 package enemies;
 
+import managers.EnemyManager;
+
 public class Knight extends Enemy {
-    public Knight(float x, float y, int ID) {
-        super(x, y, ID, 2);
+    public Knight(float x, float y, int ID, EnemyManager em) {
+        super(x, y, ID, 2, em);
     }
 }
