@@ -7,15 +7,19 @@ package objects;
 
 import helpz.Constants.Towers;
 
+/**
+ * Representa uma torre no jogo
+ * Tipos: 0=Cannon (lento, alto dano), 1=Archer (rápido, baixo dano), 2=Wizard (aplica lentidão)
+ */
 public class Tower {
-    private int x;
-    private int y;
-    private int id;
-    private int towerType;
-    private int cdTick;
-    private int dmg;
-    private float range;
-    private float cooldown;
+    private int x; // Posição X em pixels
+    private int y; // Posição Y em pixels
+    private int id; // Identificador único
+    private int towerType; // Tipo: 0=Cannon, 1=Archer, 2=Wizard
+    private int cdTick; // Contador atual de cooldown
+    private int dmg; // Dano por ataque
+    private float range; // Alcance em pixels
+    private float cooldown; // Tempo entre ataques (em ticks)
 
     public Tower(int x, int y, int id, int towerType) {
         this.x = x;
@@ -27,14 +31,24 @@ public class Tower {
         this.setDefaultCooldown();
     }
 
+    /**
+     * Atualiza a torre a cada frame
+     * Incrementa contador de cooldown
+     */
     public void update() {
         ++this.cdTick;
     }
 
+    /**
+     * Verifica se a torre pode atacar novamente
+     */
     public boolean isCooldownOver() {
         return (float)this.cdTick >= this.cooldown;
     }
 
+    /**
+     * Reinicia o cooldown após um ataque
+     */
     public void resetCooldown() {
         this.cdTick = 0;
     }

@@ -22,20 +22,24 @@ import objects.PathPoint;
 import objects.Tower;
 import ui.ActionBar;
 
+/**
+ * Cena principal onde o jogo acontece
+ * Gerencia: mapa, inimigos, torres, projéteis, waves, economia (ouro) e vidas
+ */
 public class Playing extends GameScene implements SceneMethods {
-    private int[][] lvl;
-    private ActionBar actionBar;
-    private int mouseX;
-    private int mouseY;
+    private int[][] lvl; // Matriz do mapa (20x20)
+    private ActionBar actionBar; // Barra inferior com informações e controles
+    private int mouseX; // Posição X do mouse (alinhada ao grid)
+    private int mouseY; // Posição Y do mouse (alinhada ao grid)
     private EnemyManager enemyManager;
     private TowerManager towerManager;
     private ProjectileManager projManager;
     private WaveManager waveManager;
-    private PathPoint start;
-    private PathPoint end;
-    private Tower selectedTower;
-    private int goldTick;
-    private int lives = 2;
+    private PathPoint start; // Ponto onde inimigos aparecem
+    private PathPoint end; // Ponto onde inimigos escapam
+    private Tower selectedTower; // Torre selecionada para posicionar
+    private int goldTick; // Contador para geração passiva de ouro
+    private int lives = 2; // Vidas do jogador
 
     public Playing(Game game) {
         super(game);
@@ -58,14 +62,25 @@ public class Playing extends GameScene implements SceneMethods {
         this.lvl = lvl;
     }
 
+    /**
+     * Loop principal de atualização do jogo (60 vezes por segundo)
+     * Ordem:
+     * 1. Atualiza animações
+     * 2. Gerencia waves (tempo entre waves, spawn de inimigos)
+     * 3. Gera ouro passivo (1 ouro a cada 3 segundos - 180 ticks)
+     * 4. Atualiza todos os managers (inimigos, torres, projéteis)
+     */
     public void update() {
-        this.updateTick();
+        this.updateTick(); // Atualiza contador de animações
         this.waveManager.update();
+        
+        // Sistema de renda passiva: +1 ouro a cada 180 ticks (3 segundos)
         ++this.goldTick;
         if (this.goldTick % 180 == 0) {
             this.actionBar.addGold(1);
         }
 
+        // Gerenciamento de waves: quando todos inimigos morrem, prepara próxima wave
         if (this.isAllEnemiesDead() && this.isThereMoreWaves()) {
             this.waveManager.startWaveTimer();
             if (this.isWaveTimerOver()) {
@@ -75,10 +90,12 @@ public class Playing extends GameScene implements SceneMethods {
             }
         }
 
+        // Spawn de inimigos durante a wave
         if (this.isTimeForNewEnemy()) {
             this.spawnEnemy();
         }
 
+        // Atualiza todos os elementos do jogo
         this.enemyManager.update();
         this.towerManager.update();
         this.projManager.update();
@@ -92,6 +109,12 @@ public class Playing extends GameScene implements SceneMethods {
         return this.waveManager.isThereMoreWaves();
     }
 
+    /**
+     * Verifica se todos os inimigos da wave atual foram eliminados
+     * Retorna false se:
+     * 1. Ainda há inimigos para spawnar na wave atual
+     * 2. Existe pelo menos um inimigo vivo no mapa
+     */
     private boolean isAllEnemiesDead() {
         if (this.waveManager.isThereMoreEnemiesInWave()) {
             return false;
@@ -169,16 +192,25 @@ public class Playing extends GameScene implements SceneMethods {
         }
     }
 
+    /**
+     * Gerencia cliques do mouse
+     * Três comportamentos possíveis:
+     * 1. Clique na ActionBar (y >= 640): delega para ActionBar
+     * 2. Torre selecionada: tenta posicionar torre (se for grama e não tem torre lá)
+     * 3. Sem torre selecionada: seleciona torre existente para ver info
+     */
     public void mouseClicked(int x, int y) {
         if (y >= 640) {
             this.actionBar.mouseClicked(x, y);
         } else if (this.selectedTower != null) {
+            // Verifica se pode construir: deve ser grama e não ter torre
             if (this.isTileGrass(this.mouseX, this.mouseY) && this.getTowerAt(this.mouseX, this.mouseY) == null) {
                 this.towerManager.addTower(this.selectedTower, this.mouseX, this.mouseY);
-                this.removeGold(this.selectedTower.getTowerType());
-                this.selectedTower = null;
+                this.removeGold(this.selectedTower.getTowerType()); // Desconta custo
+                this.selectedTower = null; // Limpa seleção
             }
         } else {
+            // Sem torre selecionada: clica em torre existente para ver detalhes
             Tower t = this.getTowerAt(this.mouseX, this.mouseY);
             this.actionBar.displayTower(t);
         }
@@ -193,10 +225,14 @@ public class Playing extends GameScene implements SceneMethods {
         return this.towerManager.getTowerAt(x, y);
     }
 
+    /**
+     * Verifica se um tile é grama (tipo 1)
+     * Torres só podem ser construídas em grama
+     */
     private boolean isTileGrass(int x, int y) {
         int id = this.lvl[y / 32][x / 32];
         int tileType = this.game.getTileManager().getTile(id).getTileType();
-        return tileType == 1;
+        return tileType == 1; // 0=água, 1=grama, 2=estrada
     }
 
     public void shootEnemy(Tower t, Enemy e) {

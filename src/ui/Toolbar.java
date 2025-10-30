@@ -17,25 +17,30 @@ import main.GameStates;
 import objects.Tile;
 import scenes.Editing;
 
+/**
+ * Toolbar do editor de mapas (modo Editing)
+ * Permite selecionar tiles para pintar no mapa: grama, água, estradas, marcadores de path
+ * Inclui botões para salvar e voltar ao menu
+ */
 public class Toolbar extends Bar {
     private Editing editing;
-    private MyButton bMenu;
-    private MyButton bSave;
-    private MyButton bPathStart;
-    private MyButton bPathEnd;
-    private BufferedImage pathStart;
-    private BufferedImage pathEnd;
-    private Tile selectedTile;
-    private Map<MyButton, ArrayList<Tile>> map = new HashMap();
-    private MyButton bGrass;
-    private MyButton bWater;
-    private MyButton bRoadS;
-    private MyButton bRoadC;
-    private MyButton bWaterC;
-    private MyButton bWaterB;
-    private MyButton bWaterI;
-    private MyButton currentButton;
-    private int currentIndex = 0;
+    private MyButton bMenu; // Botão voltar ao menu
+    private MyButton bSave; // Botão salvar mapa
+    private MyButton bPathStart; // Botão para marcar início do caminho
+    private MyButton bPathEnd; // Botão para marcar fim do caminho
+    private BufferedImage pathStart; // Sprite do marcador de início
+    private BufferedImage pathEnd; // Sprite do marcador de fim
+    private Tile selectedTile; // Tile atualmente selecionado para pintar
+    private Map<MyButton, ArrayList<Tile>> map = new HashMap(); // Mapeia botões para variações de tiles
+    private MyButton bGrass; // Botão de grama
+    private MyButton bWater; // Botão de água
+    private MyButton bRoadS; // Botão de estradas retas
+    private MyButton bRoadC; // Botão de curvas de estrada
+    private MyButton bWaterC; // Botão de cantos de água
+    private MyButton bWaterB; // Botão de praias
+    private MyButton bWaterI; // Botão de ilhas
+    private MyButton currentButton; // Botão rotativo atual
+    private int currentIndex = 0; // Índice da variação atual do tile
 
     public Toolbar(int x, int y, int width, int height, Editing editing) {
         super(x, y, width, height);
@@ -49,6 +54,12 @@ public class Toolbar extends Bar {
         this.pathEnd = LoadSave.getSpriteAtlas().getSubimage(256, 64, 32, 32);
     }
 
+    /**
+     * Inicializa todos os botões da toolbar
+     * Organização:
+     * - Linha superior: Menu, Save, tiles básicos (grama, água), variações de tiles
+     * - Linha inferior: PathStart e PathEnd
+     */
     private void initButtons() {
         this.bMenu = new MyButton("Menu", 2, 642, 100, 30);
         this.bSave = new MyButton("Save", 2, 674, 100, 30);
@@ -58,13 +69,19 @@ public class Toolbar extends Bar {
         int yStart = 650;
         int xOffset = (int)((float)w * 1.1F);
         int i = 0;
+        
+        // Botões de tiles simples
         this.bGrass = new MyButton("Grass", xStart, yStart, w, h, i++);
         this.bWater = new MyButton("Water", xStart + xOffset, yStart, w, h, i++);
+        
+        // Botões de tiles com variações (podem ser rotacionados com R)
         this.initMapButton(this.bRoadS, this.editing.getGame().getTileManager().getRoadsS(), xStart, yStart, xOffset, w, h, i++);
         this.initMapButton(this.bRoadC, this.editing.getGame().getTileManager().getRoadsC(), xStart, yStart, xOffset, w, h, i++);
         this.initMapButton(this.bWaterC, this.editing.getGame().getTileManager().getCorners(), xStart, yStart, xOffset, w, h, i++);
         this.initMapButton(this.bWaterB, this.editing.getGame().getTileManager().getBeaches(), xStart, yStart, xOffset, w, h, i++);
         this.initMapButton(this.bWaterI, this.editing.getGame().getTileManager().getIslands(), xStart, yStart, xOffset, w, h, i++);
+        
+        // Botões de marcadores de caminho
         this.bPathStart = new MyButton("PathStart", xStart, yStart + xOffset, w, h, i++);
         this.bPathEnd = new MyButton("PathEnd", xStart + xOffset, yStart + xOffset, w, h, i++);
     }
@@ -78,8 +95,14 @@ public class Toolbar extends Bar {
         this.editing.saveLevel();
     }
 
+    /**
+     * Rotaciona o tile selecionado (tecla R)
+     * Percorre as variações disponíveis do tile atual
+     * Ex: estrada reta pode ter 4 rotações diferentes
+     */
     public void rotateSprite() {
         ++this.currentIndex;
+        // Volta ao início se passar do último
         if (this.currentIndex >= ((ArrayList)this.map.get(this.currentButton)).size()) {
             this.currentIndex = 0;
         }
@@ -125,6 +148,10 @@ public class Toolbar extends Bar {
 
     }
 
+    /**
+     * Desenha prévia do tile selecionado no canto direito da toolbar
+     * Mostra qual tile será pintado ao clicar no mapa
+     */
     private void drawSelectedTile(Graphics g) {
         if (this.selectedTile != null) {
             g.drawImage(this.selectedTile.getSprite(), 550, 650, 50, 50, (ImageObserver)null);
@@ -138,12 +165,20 @@ public class Toolbar extends Bar {
         return this.editing.getGame().getTileManager().getSprite(id);
     }
 
+    /**
+     * Gerencia cliques nos botões da toolbar
+     * - Menu: volta ao menu
+     * - Save: salva o mapa atual
+     * - Tiles: seleciona tile para pintar
+     * - PathStart/End: marca início/fim do caminho dos inimigos
+     */
     public void mouseClicked(int x, int y) {
         if (this.bMenu.getBounds().contains(x, y)) {
             GameStates.SetGameState(GameStates.MENU);
         } else if (this.bSave.getBounds().contains(x, y)) {
             this.saveLevel();
         } else {
+            // Tiles simples
             if (this.bWater.getBounds().contains(x, y)) {
                 this.selectedTile = this.editing.getGame().getTileManager().getTile(this.bWater.getId());
                 this.editing.setSelectedTile(this.selectedTile);
@@ -156,6 +191,7 @@ public class Toolbar extends Bar {
                 return;
             }
 
+            // Marcadores de caminho (IDs especiais: -1 e -2)
             if (this.bPathStart.getBounds().contains(x, y)) {
                 this.selectedTile = new Tile(this.pathStart, -1, -1);
                 this.editing.setSelectedTile(this.selectedTile);
@@ -163,12 +199,13 @@ public class Toolbar extends Bar {
                 this.selectedTile = new Tile(this.pathEnd, -2, -2);
                 this.editing.setSelectedTile(this.selectedTile);
             } else {
+                // Tiles com variações (podem ser rotacionados)
                 for(MyButton b : this.map.keySet()) {
                     if (b.getBounds().contains(x, y)) {
                         this.selectedTile = (Tile)((ArrayList)this.map.get(b)).get(0);
                         this.editing.setSelectedTile(this.selectedTile);
-                        this.currentButton = b;
-                        this.currentIndex = 0;
+                        this.currentButton = b; // Guarda para rotação
+                        this.currentIndex = 0;  // Reseta índice
                         return;
                     }
                 }

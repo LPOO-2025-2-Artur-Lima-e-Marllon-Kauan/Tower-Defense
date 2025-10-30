@@ -15,16 +15,21 @@ import main.GameStates;
 import objects.Tower;
 import scenes.Playing;
 
+/**
+ * Barra de ações na parte inferior da tela durante o jogo
+ * Exibe: ouro, vidas, informações da wave, botões de torres, detalhes de torres selecionadas
+ * Gerencia toda a UI de gameplay
+ */
 public class ActionBar extends Bar {
     private Playing playing;
-    private MyButton bMenu;
-    private MyButton[] towerButtons;
-    private Tower selectedTower;
-    private Tower displayedTower;
-    private DecimalFormat formatter;
-    private int gold = 100;
-    private boolean showTowerCost;
-    private int towerCostType;
+    private MyButton bMenu; // Botão para voltar ao menu
+    private MyButton[] towerButtons; // 3 botões para comprar torres
+    private Tower selectedTower; // Torre selecionada para posicionar
+    private Tower displayedTower; // Torre clicada para exibir informações
+    private DecimalFormat formatter; // Formatação de números decimais (timer)
+    private int gold = 100; // Ouro inicial do jogador
+    private boolean showTowerCost; // Exibe tooltip de custo ao passar mouse
+    private int towerCostType; // Tipo da torre do tooltip
 
     public ActionBar(int x, int y, int width, int height, Playing playing) {
         super(x, y, width, height);
@@ -33,6 +38,11 @@ public class ActionBar extends Bar {
         this.initButtons();
     }
 
+    /**
+     * Inicializa todos os botões da ActionBar
+     * - 1 botão de Menu
+     * - 3 botões de torres (Cannon, Archer, Wizard)
+     */
     private void initButtons() {
         this.bMenu = new MyButton("Menu", 2, 642, 100, 30);
         this.towerButtons = new MyButton[3];
@@ -40,8 +50,9 @@ public class ActionBar extends Bar {
         int h = 50;
         int xStart = 110;
         int yStart = 650;
-        int xOffset = (int)((float)w * 1.1F);
+        int xOffset = (int)((float)w * 1.1F); // 10% de espaço entre botões
 
+        // Cria os 3 botões de torres com IDs correspondentes
         for(int i = 0; i < this.towerButtons.length; ++i) {
             this.towerButtons[i] = new MyButton("", xStart + xOffset * i, yStart, w, h, i);
         }
@@ -61,20 +72,33 @@ public class ActionBar extends Bar {
 
     }
 
+    /**
+     * Renderiza toda a ActionBar e seus componentes
+     */
     public void draw(Graphics g) {
+        // Fundo laranja da barra
         g.setColor(new Color(220, 123, 15));
         g.fillRect(this.x, this.y, this.width, this.height);
+        
+        // Desenha todos os elementos da UI
         this.drawButtons(g);
         this.drawDisplayedTower(g);
         this.drawWaveInfo(g);
         this.drawGoldAmount(g);
         this.drawLives(g);
+        
+        // Tooltip de custo da torre (ao passar mouse)
         if (this.showTowerCost) {
             this.drawTowerCost(g);
         }
 
     }
 
+    /**
+     * Desenha tooltip mostrando nome e custo da torre
+     * Aparece ao passar o mouse sobre um botão de torre
+     * Mostra aviso vermelho se não tiver ouro suficiente
+     */
     private void drawTowerCost(Graphics g) {
         g.setColor(Color.gray);
         g.fillRect(280, 650, 120, 50);
@@ -82,6 +106,8 @@ public class ActionBar extends Bar {
         g.drawRect(280, 650, 120, 50);
         g.drawString(this.getTowerCostName(), 285, 670);
         g.drawString("Cost: " + this.getTowerCostCost() + "g", 285, 695);
+        
+        // Aviso se não tiver ouro suficiente
         if (this.isTowerCostMoreThanCurrentGold()) {
             g.setColor(Color.RED);
             g.drawString("Can't Afford", 270, 725);
@@ -110,6 +136,12 @@ public class ActionBar extends Bar {
         g.drawString("Lives: " + this.playing.getLives(), 350, 725);
     }
 
+    /**
+     * Desenha informações sobre as waves
+     * - Timer até próxima wave
+     * - Quantidade de inimigos restantes
+     * - Wave atual / total
+     */
     private void drawWaveInfo(Graphics g) {
         g.setColor(Color.black);
         g.setFont(new Font("LucidaSans", 1, 20));
@@ -138,19 +170,28 @@ public class ActionBar extends Bar {
 
     }
 
+    /**
+     * Desenha detalhes da torre selecionada/clicada
+     * Mostra: sprite, nome, ID, borda azul no mapa, círculo de alcance
+     */
     private void drawDisplayedTower(Graphics g) {
         if (this.displayedTower != null) {
+            // Caixa de informações da torre
             g.setColor(Color.gray);
             g.fillRect(410, 645, 220, 85);
             g.setColor(Color.black);
             g.drawRect(410, 645, 220, 85);
             g.drawRect(420, 650, 50, 50);
+            
+            // Sprite e texto
             g.drawImage(this.playing.getTowerManager().getTowerImgs()[this.displayedTower.getTowerType()], 420, 650, 50, 50, (ImageObserver)null);
             g.setFont(new Font("LucidaSans", 1, 15));
             g.drawString(Towers.GetName(this.displayedTower.getTowerType()), 490, 660);
             g.drawString("ID: " + this.displayedTower.getId(), 490, 675);
-            this.drawDisplayedTowerBorder(g);
-            this.drawDisplayedTowerRange(g);
+            
+            // Feedback visual no mapa
+            this.drawDisplayedTowerBorder(g); // Borda azul
+            this.drawDisplayedTowerRange(g);  // Círculo de alcance
         }
 
     }
@@ -169,6 +210,11 @@ public class ActionBar extends Bar {
         this.displayedTower = t;
     }
 
+    /**
+     * Gerencia cliques nos botões da ActionBar
+     * - Botão Menu: volta ao menu principal
+     * - Botões de Torres: seleciona torre para construir (se tiver ouro)
+     */
     public void mouseClicked(int x, int y) {
         if (this.bMenu.getBounds().contains(x, y)) {
             GameStates.SetGameState(GameStates.MENU);
@@ -176,10 +222,12 @@ public class ActionBar extends Bar {
             MyButton[] var6;
             for(MyButton b : var6 = this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
+                    // Verifica se tem ouro suficiente
                     if (!this.isGoldEnoughForTower(b.getId())) {
                         return;
                     }
 
+                    // Cria torre temporária para posicionamento
                     this.selectedTower = new Tower(0, 0, -1, b.getId());
                     this.playing.setSelectedTower(this.selectedTower);
                     return;
@@ -193,7 +241,12 @@ public class ActionBar extends Bar {
         return this.gold >= Towers.GetTowerCost(towerType);
     }
 
+    /**
+     * Atualiza estados de hover dos botões
+     * Mostra tooltip de custo quando mouse está sobre botão de torre
+     */
     public void mouseMoved(int x, int y) {
+        // Reseta todos os estados de hover
         this.bMenu.setMouseOver(false);
         this.showTowerCost = false;
 
@@ -202,14 +255,15 @@ public class ActionBar extends Bar {
             b.setMouseOver(false);
         }
 
+        // Verifica qual botão está sob o mouse
         if (this.bMenu.getBounds().contains(x, y)) {
             this.bMenu.setMouseOver(true);
         } else {
             for(MyButton b : var6 = this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
                     b.setMouseOver(true);
-                    this.showTowerCost = true;
-                    this.towerCostType = b.getId();
+                    this.showTowerCost = true;    // Ativa tooltip
+                    this.towerCostType = b.getId(); // Define tipo para tooltip
                     return;
                 }
             }
@@ -242,10 +296,16 @@ public class ActionBar extends Bar {
 
     }
 
+    /**
+     * Desconta o custo da torre do ouro do jogador
+     */
     public void payForTower(int towerType) {
         this.gold -= Towers.GetTowerCost(towerType);
     }
 
+    /**
+     * Adiciona ouro ao jogador (ao matar inimigos ou por renda passiva)
+     */
     public void addGold(int getReward) {
         this.gold += getReward;
     }
