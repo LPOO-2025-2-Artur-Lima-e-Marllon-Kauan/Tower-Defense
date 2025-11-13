@@ -11,7 +11,6 @@ import helpz.Constants.Enemies;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import main.Game;
 import managers.EnemyManager;
@@ -28,13 +27,13 @@ import ui.ActionBar;
  */
 public class Playing extends GameScene implements SceneMethods {
     private int[][] lvl; // Matriz do mapa (20x20)
-    private ActionBar actionBar; // Barra inferior com informações e controles
+    private final ActionBar actionBar; // Barra inferior com informações e controles
     private int mouseX; // Posição X do mouse (alinhada ao grid)
     private int mouseY; // Posição Y do mouse (alinhada ao grid)
-    private EnemyManager enemyManager;
-    private TowerManager towerManager;
-    private ProjectileManager projManager;
-    private WaveManager waveManager;
+    private final EnemyManager enemyManager;
+    private final TowerManager towerManager;
+    private final ProjectileManager projManager;
+    private final WaveManager waveManager;
     private PathPoint start; // Ponto onde inimigos aparecem
     private PathPoint end; // Ponto onde inimigos escapam
     private Tower selectedTower; // Torre selecionada para posicionar
@@ -54,8 +53,8 @@ public class Playing extends GameScene implements SceneMethods {
     private void loadDefaultLevel() {
         this.lvl = LoadSave.GetLevelData("new_level");
         ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints("new_level");
-        this.start = (PathPoint)points.get(0);
-        this.end = (PathPoint)points.get(1);
+        this.start = points.get(0);
+        this.end = points.get(1);
     }
 
     public void setLevel(int[][] lvl) {
@@ -158,7 +157,23 @@ public class Playing extends GameScene implements SceneMethods {
 
     private void drawSelectedTower(Graphics g) {
         if (this.selectedTower != null) {
-            g.drawImage(this.towerManager.getTowerImgs()[this.selectedTower.getTowerType()], this.mouseX, this.mouseY, (ImageObserver)null);
+            // desenha um bloco colorido semi-transparente da torre selecionada (24x24)
+            final int blockSize = 24;
+            final int offset = 4;
+            int x = this.mouseX + offset;
+            int y = this.mouseY + offset;
+
+            Color col;
+            switch (this.selectedTower.getTowerType()) {
+                case 0 -> col = new Color(220, 100, 50, 150); // Cannon - laranja semi-transparente
+                case 1 -> col = new Color(100, 200, 50, 150); // Archer - verde-claro semi-transparente
+                case 2 -> col = new Color(150, 100, 200, 150); // Wizard - roxo semi-transparente
+                default -> col = new Color(255, 0, 255, 150);
+            }
+            g.setColor(col);
+            g.fillRect(x, y, blockSize, blockSize);
+            g.setColor(Color.WHITE);
+            g.drawRect(x, y, blockSize, blockSize);
         }
 
     }
@@ -167,11 +182,18 @@ public class Playing extends GameScene implements SceneMethods {
         for(int y = 0; y < this.lvl.length; ++y) {
             for(int x = 0; x < this.lvl[y].length; ++x) {
                 int id = this.lvl[y][x];
-                if (this.isAnimation(id)) {
-                    g.drawImage(this.getSprite(id, this.animationIndex), x * 32, y * 32, (ImageObserver)null);
-                } else {
-                    g.drawImage(this.getSprite(id), x * 32, y * 32, (ImageObserver)null);
+                int tileType = this.game.getTileManager().getTile(id).getTileType();
+
+                Color color;
+                switch (tileType) {
+                    case 0 -> color = new Color(0, 100, 200); // água - azul
+                    case 1 -> color = new Color(50, 150, 50); // chão/grama - verde
+                    case 2 -> color = Color.BLACK; // caminho - preto
+                    default -> color = Color.MAGENTA;
                 }
+
+                g.setColor(color);
+                g.fillRect(x * 32, y * 32, 32, 32);
             }
         }
 
