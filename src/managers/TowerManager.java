@@ -6,11 +6,9 @@
 package managers;
 
 import enemies.Enemy;
-import helpz.LoadSave;
 import helpz.Utilz;
+import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import objects.Tower;
 import scenes.Playing;
@@ -20,24 +18,14 @@ import scenes.Playing;
  * Responsável por: posicionamento, atualização, renderização e sistema de ataque
  */
 public class TowerManager {
-    private Playing playing;
-    private BufferedImage[] towerImgs; // Sprites das torres (Cannon, Archer, Wizard)
-    private ArrayList<Tower> towers = new ArrayList(); // Lista de todas as torres no mapa
+    private final Playing playing;
+    // torres agora são desenhadas como blocos coloridos
+    private final ArrayList<Tower> towers = new ArrayList<>(); // Lista de todas as torres no mapa
     private int towerAmount = 0; // Contador para IDs únicos das torres
 
     public TowerManager(Playing playing) {
         this.playing = playing;
-        this.loadTowerImgs();
-    }
-
-    private void loadTowerImgs() {
-        BufferedImage atlas = LoadSave.getSpriteAtlas();
-        this.towerImgs = new BufferedImage[3];
-
-        for(int i = 0; i < 3; ++i) {
-            this.towerImgs[i] = atlas.getSubimage((4 + i) * 32, 32, 32, 32);
-        }
-
+        // sem carregamento de sprites para torres
     }
 
     /**
@@ -88,7 +76,24 @@ public class TowerManager {
 
     public void draw(Graphics g) {
         for(Tower t : this.towers) {
-            g.drawImage(this.towerImgs[t.getTowerType()], t.getX(), t.getY(), (ImageObserver)null);
+            // desenha um bloco colorido representando a torre (24x24, centralizado)
+            final int blockSize = 24;
+            final int offset = 4; // (32-24)/2 para centralizar
+            int x = t.getX() + offset;
+            int y = t.getY() + offset;
+
+            Color col;
+            switch (t.getTowerType()) {
+                case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
+                case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
+                case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
+                default -> col = Color.MAGENTA;
+            }
+            g.setColor(col);
+            g.fillRect(x, y, blockSize, blockSize);
+            // contorno
+            g.setColor(Color.black);
+            g.drawRect(x, y, blockSize, blockSize);
         }
 
     }
@@ -105,9 +110,5 @@ public class TowerManager {
         }
 
         return null;
-    }
-
-    public BufferedImage[] getTowerImgs() {
-        return this.towerImgs;
     }
 }

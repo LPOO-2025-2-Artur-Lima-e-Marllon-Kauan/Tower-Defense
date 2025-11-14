@@ -9,7 +9,6 @@ import helpz.Constants.Towers;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.image.ImageObserver;
 import java.text.DecimalFormat;
 import main.GameStates;
 import objects.Tower;
@@ -21,12 +20,11 @@ import scenes.Playing;
  * Gerencia toda a UI de gameplay
  */
 public class ActionBar extends Bar {
-    private Playing playing;
+    private final Playing playing;
     private MyButton bMenu; // Botão para voltar ao menu
     private MyButton[] towerButtons; // 3 botões para comprar torres
-    private Tower selectedTower; // Torre selecionada para posicionar
     private Tower displayedTower; // Torre clicada para exibir informações
-    private DecimalFormat formatter; // Formatação de números decimais (timer)
+    private final DecimalFormat formatter; // Formatação de números decimais (timer)
     private int gold = 100; // Ouro inicial do jogador
     private boolean showTowerCost; // Exibe tooltip de custo ao passar mouse
     private int towerCostType; // Tipo da torre do tooltip
@@ -62,11 +60,23 @@ public class ActionBar extends Bar {
     private void drawButtons(Graphics g) {
         this.bMenu.draw(g);
 
-        MyButton[] var5;
-        for(MyButton b : var5 = this.towerButtons) {
+        for(MyButton b : this.towerButtons) {
             g.setColor(Color.gray);
             g.fillRect(b.x, b.y, b.width, b.height);
-            g.drawImage(this.playing.getTowerManager().getTowerImgs()[b.getId()], b.x, b.y, b.width, b.height, (ImageObserver)null);
+
+            // Desenha bloco colorido representando a torre
+            Color col;
+            switch (b.getId()) {
+                case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
+                case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
+                case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
+                default -> col = Color.MAGENTA;
+            }
+            g.setColor(col);
+            g.fillRect(b.x + 5, b.y + 5, b.width - 10, b.height - 10);
+            g.setColor(Color.black);
+            g.drawRect(b.x + 5, b.y + 5, b.width - 10, b.height - 10);
+
             this.drawButtonFeedback(g, b);
         }
 
@@ -144,7 +154,7 @@ public class ActionBar extends Bar {
      */
     private void drawWaveInfo(Graphics g) {
         g.setColor(Color.black);
-        g.setFont(new Font("LucidaSans", 1, 20));
+        g.setFont(new Font("LucidaSans", Font.BOLD, 20));
         this.drawWaveTimerInfo(g);
         this.drawEnemiesLeftInfo(g);
         this.drawWavesLeftInfo(g);
@@ -164,7 +174,7 @@ public class ActionBar extends Bar {
     private void drawWaveTimerInfo(Graphics g) {
         if (this.playing.getWaveManager().isWaveTimerStarted()) {
             float timeLeft = this.playing.getWaveManager().getTimeLeft();
-            String formattedText = this.formatter.format((double)timeLeft);
+            String formattedText = this.formatter.format(timeLeft);
             g.drawString("Time Left: " + formattedText, 425, 750);
         }
 
@@ -172,7 +182,7 @@ public class ActionBar extends Bar {
 
     /**
      * Desenha detalhes da torre selecionada/clicada
-     * Mostra: sprite, nome, ID, borda azul no mapa, círculo de alcance
+     * Mostra: bloco colorido, nome, ID, borda azul no mapa, círculo de alcance
      */
     private void drawDisplayedTower(Graphics g) {
         if (this.displayedTower != null) {
@@ -183,9 +193,21 @@ public class ActionBar extends Bar {
             g.drawRect(410, 645, 220, 85);
             g.drawRect(420, 650, 50, 50);
             
-            // Sprite e texto
-            g.drawImage(this.playing.getTowerManager().getTowerImgs()[this.displayedTower.getTowerType()], 420, 650, 50, 50, (ImageObserver)null);
-            g.setFont(new Font("LucidaSans", 1, 15));
+            // Desenha bloco colorido da torre
+            Color col;
+            switch (this.displayedTower.getTowerType()) {
+                case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
+                case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
+                case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
+                default -> col = Color.MAGENTA;
+            }
+            g.setColor(col);
+            g.fillRect(425, 655, 40, 40);
+            g.setColor(Color.black);
+            g.drawRect(425, 655, 40, 40);
+
+            g.setFont(new Font("LucidaSans", Font.BOLD, 15));
+            g.setColor(Color.black);
             g.drawString(Towers.GetName(this.displayedTower.getTowerType()), 490, 660);
             g.drawString("ID: " + this.displayedTower.getId(), 490, 675);
             
@@ -219,8 +241,7 @@ public class ActionBar extends Bar {
         if (this.bMenu.getBounds().contains(x, y)) {
             GameStates.SetGameState(GameStates.MENU);
         } else {
-            MyButton[] var6;
-            for(MyButton b : var6 = this.towerButtons) {
+            for(MyButton b : this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
                     // Verifica se tem ouro suficiente
                     if (!this.isGoldEnoughForTower(b.getId())) {
@@ -228,8 +249,8 @@ public class ActionBar extends Bar {
                     }
 
                     // Cria torre temporária para posicionamento
-                    this.selectedTower = new Tower(0, 0, -1, b.getId());
-                    this.playing.setSelectedTower(this.selectedTower);
+                    Tower selectedTower = new Tower(0, 0, -1, b.getId());
+                    this.playing.setSelectedTower(selectedTower);
                     return;
                 }
             }
@@ -250,8 +271,7 @@ public class ActionBar extends Bar {
         this.bMenu.setMouseOver(false);
         this.showTowerCost = false;
 
-        MyButton[] var6;
-        for(MyButton b : var6 = this.towerButtons) {
+        for(MyButton b : this.towerButtons) {
             b.setMouseOver(false);
         }
 
@@ -259,7 +279,7 @@ public class ActionBar extends Bar {
         if (this.bMenu.getBounds().contains(x, y)) {
             this.bMenu.setMouseOver(true);
         } else {
-            for(MyButton b : var6 = this.towerButtons) {
+            for(MyButton b : this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
                     b.setMouseOver(true);
                     this.showTowerCost = true;    // Ativa tooltip
@@ -275,8 +295,7 @@ public class ActionBar extends Bar {
         if (this.bMenu.getBounds().contains(x, y)) {
             this.bMenu.setMousePressed(true);
         } else {
-            MyButton[] var6;
-            for(MyButton b : var6 = this.towerButtons) {
+            for(MyButton b : this.towerButtons) {
                 if (b.getBounds().contains(x, y)) {
                     b.setMousePressed(true);
                     return;
@@ -289,8 +308,7 @@ public class ActionBar extends Bar {
     public void mouseReleased(int x, int y) {
         this.bMenu.resetBooleans();
 
-        MyButton[] var6;
-        for(MyButton b : var6 = this.towerButtons) {
+        for(MyButton b : this.towerButtons) {
             b.resetBooleans();
         }
 

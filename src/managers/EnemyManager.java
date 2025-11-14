@@ -10,12 +10,10 @@ import enemies.Enemy;
 import enemies.Knight;
 import enemies.Orc;
 import enemies.Wolf;
-import helpz.LoadSave;
 import helpz.Constants.Enemies;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import objects.PathPoint;
 import scenes.Playing;
@@ -25,34 +23,18 @@ import scenes.Playing;
  * Responsável por: spawning, movimento, renderização e remoção de inimigos
  */
 public class EnemyManager {
-    private Playing playing;
-    private BufferedImage[] enemyImgs; // Sprites de cada tipo de inimigo
-    private ArrayList<Enemy> enemies = new ArrayList(); // Lista de todos os inimigos ativos
-    private PathPoint start; // Ponto inicial do caminho
-    private PathPoint end; // Ponto final do caminho (onde inimigos escapam)
-    private int HPbarWidth = 20; // Largura da barra de vida em pixels
-    private BufferedImage slowEffect; // Imagem do efeito visual de lentidão
+    private final Playing playing;
+    // sprites foram removidos — usamos blocos coloridos para representar inimigos
+    private final ArrayList<Enemy> enemies = new ArrayList<>(); // Lista de todos os inimigos ativos
+    private final PathPoint start; // Ponto inicial do caminho
+    private final PathPoint end; // Ponto final do caminho (onde inimigos escapam)
+    private static final int HPbarWidth = 20; // Largura da barra de vida em pixels
 
     public EnemyManager(Playing playing, PathPoint start, PathPoint end) {
         this.playing = playing;
-        this.enemyImgs = new BufferedImage[4];
         this.start = start;
         this.end = end;
-        this.loadEffectImg();
-        this.loadEnemyImgs();
-    }
-
-    private void loadEffectImg() {
-        this.slowEffect = LoadSave.getSpriteAtlas().getSubimage(288, 64, 32, 32);
-    }
-
-    private void loadEnemyImgs() {
-        BufferedImage atlas = LoadSave.getSpriteAtlas();
-
-        for(int i = 0; i < 4; ++i) {
-            this.enemyImgs[i] = atlas.getSubimage(i * 32, 32, 32, 32);
-        }
-
+        // sem carregamento de sprites para inimigos — projéteis permanecem com sprites
     }
 
     public void update() {
@@ -87,7 +69,7 @@ public class EnemyManager {
         // Calcula próxima posição baseado na direção e velocidade
         int newX = (int)(e.getX() + this.getSpeedAndWidth(e.getLastDir(), e.getEnemyType()));
         int newY = (int)(e.getY() + this.getSpeedAndHeight(e.getLastDir(), e.getEnemyType()));
-        
+
         // Verifica se a próxima posição é estrada (tile tipo 2)
         if (this.getTileType(newX, newY) == 2) {
             e.move(Enemies.GetSpeed(e.getEnemyType()), e.getLastDir());
@@ -109,7 +91,7 @@ public class EnemyManager {
         int xCord = (int)(e.getX() / 32.0F); // Converte pixels para coordenadas de tile
         int yCord = (int)(e.getY() / 32.0F);
         this.fixEnemyOffsetTile(e, dir, xCord, yCord); // Alinha inimigo ao grid
-        
+
         if (!this.isAtEnd(e)) {
             // Se estava indo vertical (UP ou DOWN), tenta horizontal
             if (dir != 0 && dir != 2) {
@@ -211,7 +193,12 @@ public class EnemyManager {
 
     private void drawEffects(Enemy e, Graphics g) {
         if (e.isSlowed()) {
-            g.drawImage(this.slowEffect, (int)e.getX(), (int)e.getY(), (ImageObserver)null);
+            // overlay azul semi-transparente indicando slow
+            Graphics2D g2 = (Graphics2D) g;
+            Color old = g2.getColor();
+            g2.setColor(new Color(0, 100, 255, 90));
+            g2.fillRect((int)e.getX(), (int)e.getY(), 32, 32);
+            g2.setColor(old);
         }
 
     }
@@ -222,11 +209,29 @@ public class EnemyManager {
     }
 
     private int getNewBarWidth(Enemy e) {
-        return (int)((float)this.HPbarWidth * e.getHealthBarFloat());
+        return (int)((float)EnemyManager.HPbarWidth * e.getHealthBarFloat());
     }
 
     private void drawEnemy(Enemy e, Graphics g) {
-        g.drawImage(this.enemyImgs[e.getEnemyType()], (int)e.getX(), (int)e.getY(), (ImageObserver)null);
+        // desenha um bloco colorido representando o inimigo (24x24 pixels, centralizado)
+        final int blockSize = 24;
+        final int offset = 4; // (32-24)/2 para centralizar no tile
+        int x = (int)e.getX() + offset;
+        int y = (int)e.getY() + offset;
+
+        Color col;
+        switch (e.getEnemyType()) {
+            case 0 -> col = new Color(134, 94, 66); // Orc
+            case 1 -> col = new Color(150, 150, 150); // Bat
+            case 2 -> col = new Color(120, 120, 160); // Knight
+            case 3 -> col = new Color(80, 80, 80); // Wolf
+            default -> col = Color.MAGENTA;
+        }
+        g.setColor(col);
+        g.fillRect(x, y, blockSize, blockSize);
+        // contorno
+        g.setColor(Color.black);
+        g.drawRect(x, y, blockSize, blockSize);
     }
 
     public ArrayList<Enemy> getEnemies() {
@@ -256,3 +261,4 @@ public class EnemyManager {
         this.playing.rewardPlayer(enemyType);
     }
 }
+
