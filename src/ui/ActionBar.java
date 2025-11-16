@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.text.DecimalFormat;
-import main.GameStates;
 import objects.Tower;
 import scenes.Playing;
 
@@ -47,7 +46,7 @@ public class ActionBar extends Bar {
         int w = 50;
         int h = 50;
         int xStart = 20;   // alinhado mais à esquerda para um layout limpo
-        int yStart = 660;  // um pouco acima da base da ActionBar
+        int yStart = 635;  // um pouco acima da base da ActionBar
         int xOffset = (int)(w * 1.2f); // pequeno espaço entre botões
 
         // Cria os 4 botões de torres com IDs correspondentes
@@ -59,7 +58,7 @@ public class ActionBar extends Bar {
         int upgW = 110;
         int upgH = 35;
         int upgX = 480;
-        int upgY = 700;
+        int upgY = 630;
         this.upgradeButton = new MyButton("Upgrade", upgX, upgY, upgW, upgH);
     }
 
@@ -67,7 +66,7 @@ public class ActionBar extends Bar {
         // Título da área de seleção de torres
         g.setColor(Color.WHITE);
         g.setFont(new Font("LucidaSans", Font.BOLD, 16));
-        g.drawString("Torres", 20, 650);
+        g.drawString("Torres", 20, 630);
 
         for (MyButton b : this.towerButtons) {
             g.setColor(Color.gray);
@@ -83,9 +82,9 @@ public class ActionBar extends Bar {
                 default -> col = Color.MAGENTA;
             }
             g.setColor(col);
-            g.fillRect(b.x + 5, b.y + 5, b.width - 10, b.height - 10);
+            g.fillRect(b.x + 5, b.y +5 , b.width - 10, b.height - 10);
             g.setColor(Color.black);
-            g.drawRect(b.x + 5, b.y + 5, b.width - 10, b.height - 10);
+            g.drawRect(b.x + 5, b.y +5, b.width - 10, b.height - 10);
 
             this.drawButtonFeedback(g, b);
         }
@@ -119,16 +118,16 @@ public class ActionBar extends Bar {
      */
     private void drawTowerCost(Graphics g) {
         g.setColor(Color.gray);
-        g.fillRect(280, 650, 120, 50);
+        g.fillRect(280, 635, 150, 50);
         g.setColor(Color.black);
-        g.drawRect(280, 650, 120, 50);
-        g.drawString(this.getTowerCostName(), 285, 670);
-        g.drawString("Cost: " + this.getTowerCostCost() + "g", 285, 695);
+        g.drawRect(280, 635, 150, 50);
+        g.drawString(this.getTowerCostName(), 285, 655);
+        g.drawString("Custo: " + this.getTowerCostCost() + "g", 285, 675);
         
         // Aviso se não tiver ouro suficiente
         if (this.isTowerCostMoreThanCurrentGold()) {
             g.setColor(Color.RED);
-            g.drawString("Can't Afford", 270, 725);
+            g.drawString("Ouro insuficiente", 270, 630);
         }
 
     }
@@ -147,12 +146,12 @@ public class ActionBar extends Bar {
 
     private void drawGoldAmount(Graphics g) {
         // Mesmo estilo de texto das waves, posicionado à direita
-        g.drawString("Ouro: " + this.gold + "g", 425, 720);
+        g.drawString("Ouro: " + this.gold + "g", 450, 700);
     }
 
     private void drawLives(Graphics g) {
         // Logo abaixo do ouro, ainda acima das waves
-        g.drawString("Vidas: " + this.playing.getLives(), 425, 735);
+        g.drawString("Vidas: " + this.playing.getLives(), 450, 720);
     }
 
     /**
@@ -162,7 +161,8 @@ public class ActionBar extends Bar {
      * - Wave atual / total
      */
     private void drawWaveInfo(Graphics g) {
-        g.setColor(Color.black);
+        // Texto da HUD da ActionBar deve ser branco para boa visibilidade
+        g.setColor(Color.WHITE);
         g.setFont(new Font("LucidaSans", Font.BOLD, 20));
 
         // Ouro e vidas acima das informações de wave/inimigos, mesmo estilo de fonte
@@ -177,19 +177,19 @@ public class ActionBar extends Bar {
     private void drawWavesLeftInfo(Graphics g) {
         int current = this.playing.getWaveManager().getWaveIndex();
         int size = this.playing.getWaveManager().getWaves().size();
-        g.drawString("Wave " + (current + 1) + " / " + size, 425, 770);
+        g.drawString("Wave " + (current + 1) + " / " + size, 450, 750);
     }
 
     private void drawEnemiesLeftInfo(Graphics g) {
         int remaining = this.playing.getEnemyManger().getAmountOfAliveEnemies();
-        g.drawString("Enemies Left: " + remaining, 425, 790);
+        g.drawString("Enemies Left: " + remaining, 450, 770);
     }
 
     private void drawWaveTimerInfo(Graphics g) {
         if (this.playing.getWaveManager().isWaveTimerStarted()) {
             float timeLeft = this.playing.getWaveManager().getTimeLeft();
             String formattedText = this.formatter.format(timeLeft);
-            g.drawString("Time Left: " + formattedText, 425, 750);
+            g.drawString("Time Left: " + formattedText, 450, 20);
         }
 
     }
@@ -360,6 +360,9 @@ public class ActionBar extends Bar {
         }
         this.upgradeButton.resetBooleans();
 
+        // After releasing, update hover state based on current mouse position
+        // (this uses the x,y params so they are not reported as unused)
+        this.mouseMoved(x, y);
     }
 
     /**

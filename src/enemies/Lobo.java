@@ -7,8 +7,8 @@ package enemies;
 
 import managers.EnemyManager;
 
-public class Knight extends Enemy {
-    public Knight(float x, float y, int ID, EnemyManager em) {
-        super(x, y, ID, 2, em);
+public class Lobo extends Enemy {
+    public Lobo(float x, float y, int ID, EnemyManager em) {
+        super(x, y, ID, 3, em);
     }
 }

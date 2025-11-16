@@ -96,7 +96,7 @@ public class MyButton {
         int w = g.getFontMetrics().stringWidth(this.text);
         int h = g.getFontMetrics().getHeight();
         // Calcula posição para centralizar o texto
-        g.drawString(this.text, this.x - w / 2 + this.width / 2, this.y + h / 2 + this.height / 2);
+        g.drawString(this.text, this.x - w / 2 + this.width / 2, this.y + h / 4 + this.height / 2);
     }
 
     public void resetBooleans() {

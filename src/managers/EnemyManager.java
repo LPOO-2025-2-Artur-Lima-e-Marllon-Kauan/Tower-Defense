@@ -180,8 +180,8 @@ public class EnemyManager {
         switch (enemyType) {
             case 0 -> e = new Orc((float)x, (float)y, 0, this);
             case 1 -> e = new Bat((float)x, (float)y, 0, this);
-            case 2 -> e = new Knight((float)x, (float)y, 0, this);
-            case 3 -> e = new Wolf((float)x, (float)y, 0, this);
+            case 2 -> e = new Cavaleiro((float)x, (float)y, 0, this);
+            case 3 -> e = new Lobo((float)x, (float)y, 0, this);
         }
 
         if (e != null) {

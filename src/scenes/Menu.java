@@ -22,10 +22,10 @@ public class Menu extends GameScene implements SceneMethods {
     }
 
     private void initButtons() {
-        int w = 180;
+        int w = 200;
         int h = 60;
         int x = 320 - w / 2; // centralizado horizontalmente (largura total 640)
-        int y = 400 - h / 2; // centralizado verticalmente (altura total 800)
+        int y = 420 - h / 2; // centralizado verticalmente (altura total 800)
 
         // Único botão "Play" na tela inicial
         this.bPlaying = new MyButton("Play", x, y, w, h);

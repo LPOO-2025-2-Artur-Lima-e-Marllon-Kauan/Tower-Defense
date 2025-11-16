@@ -26,6 +26,13 @@ public class Bar {
     }
 
     /**
+     * Retorna a posição Y (topo) da barra para uso externo
+     */
+    public int getY() {
+        return this.y;
+    }
+
+    /**
      * Desenha feedback visual para botões (hover e pressed)
      * - Borda branca ao passar mouse
      * - Bordas internas ao pressionar

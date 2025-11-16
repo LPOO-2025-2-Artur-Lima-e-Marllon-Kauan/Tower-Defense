@@ -156,7 +156,7 @@ public class Toolbar extends Bar {
         if (this.selectedTile != null) {
             g.drawImage(this.selectedTile.getSprite(), 550, 650, 50, 50, (ImageObserver)null);
             g.setColor(Color.black);
-            g.drawRect(550, 650, 50, 50);
+            g.drawRect(550, 600, 50, 50);
         }
 
     }

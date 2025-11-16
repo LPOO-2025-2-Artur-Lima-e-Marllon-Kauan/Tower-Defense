@@ -39,11 +39,12 @@ public class Playing extends GameScene implements SceneMethods {
     private Tower selectedTower; // Torre selecionada para posicionar
     private int goldTick; // Contador para geração passiva de ouro
     private int lives = 8; // Vidas do jogador (aumentado para 8 corações)
+    private final int TILE_SIZE = 32; // tamanho do tile (padronizado)
 
     public Playing(Game game) {
         super(game);
         this.loadDefaultLevel();
-        this.actionBar = new ActionBar(0, 640, 640, 160, this);
+        this.actionBar = new ActionBar(0, 600, 640, 200, this);
         this.enemyManager = new EnemyManager(this, this.start, this.end);
         this.towerManager = new TowerManager(this);
         this.projManager = new ProjectileManager(this);
@@ -223,7 +224,7 @@ public class Playing extends GameScene implements SceneMethods {
      * 3. Sem torre selecionada: seleciona torre existente para ver info
      */
     public void mouseClicked(int x, int y) {
-        if (y >= 640) {
+        if (y >= this.actionBar.getY()) {
             this.actionBar.mouseClicked(x, y);
         } else if (this.selectedTower != null) {
             // Verifica se pode construir: deve ser grama e não ter torre
@@ -253,7 +254,7 @@ public class Playing extends GameScene implements SceneMethods {
      * Torres só podem ser construídas em grama
      */
     private boolean isTileGrass(int x, int y) {
-        int id = this.lvl[y / 32][x / 32];
+        int id = this.lvl[y / this.TILE_SIZE][x / this.TILE_SIZE];
         int tileType = this.game.getTileManager().getTile(id).getTileType();
         return tileType == 1; // 0=água, 1=grama, 2=estrada
     }
@@ -270,17 +271,17 @@ public class Playing extends GameScene implements SceneMethods {
     }
 
     public void mouseMoved(int x, int y) {
-        if (y >= 640) {
+        if (y >= this.actionBar.getY()) {
             this.actionBar.mouseMoved(x, y);
         } else {
-            this.mouseX = x / 32 * 32;
-            this.mouseY = y / 32 * 32;
+            this.mouseX = x / this.TILE_SIZE * this.TILE_SIZE;
+            this.mouseY = y / this.TILE_SIZE * this.TILE_SIZE;
         }
 
     }
 
     public void mousePressed(int x, int y) {
-        if (y >= 640) {
+        if (y >= this.actionBar.getY()) {
             this.actionBar.mousePressed(x, y);
         }
 
