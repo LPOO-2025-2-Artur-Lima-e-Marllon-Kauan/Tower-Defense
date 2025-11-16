@@ -38,7 +38,7 @@ public class Playing extends GameScene implements SceneMethods {
     private PathPoint end; // Ponto onde inimigos escapam
     private Tower selectedTower; // Torre selecionada para posicionar
     private int goldTick; // Contador para geração passiva de ouro
-    private int lives = 2; // Vidas do jogador
+    private int lives = 8; // Vidas do jogador (aumentado para 8 corações)
 
     public Playing(Game game) {
         super(game);
@@ -168,6 +168,7 @@ public class Playing extends GameScene implements SceneMethods {
                 case 0 -> col = new Color(220, 100, 50, 150); // Cannon - laranja semi-transparente
                 case 1 -> col = new Color(100, 200, 50, 150); // Archer - verde-claro semi-transparente
                 case 2 -> col = new Color(150, 100, 200, 150); // Wizard - roxo semi-transparente
+                case 3 -> col = new Color(80, 200, 120, 150); // Cospe Veneno - verde semi-transparente
                 default -> col = new Color(255, 0, 255, 150);
             }
             g.setColor(col);
@@ -300,7 +301,7 @@ public class Playing extends GameScene implements SceneMethods {
     public void enemyEscaped() {
         this.lives--;
         if (this.lives <= 0) {
-            main.GameStates.SetGameState(main.GameStates.MENU);
+            main.GameStates.SetGameState(main.GameStates.GAME_OVER);
         }
     }
 

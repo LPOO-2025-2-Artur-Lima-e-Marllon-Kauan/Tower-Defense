@@ -15,17 +15,19 @@ public class Tower {
     private int x; // Posição X em pixels
     private int y; // Posição Y em pixels
     private int id; // Identificador único
-    private int towerType; // Tipo: 0=Cannon, 1=Archer, 2=Wizard
+    private int towerType; // Tipo: 0=Cannon, 1=Archer, 2=Wizard, 3=Cospe Veneno
     private int cdTick; // Contador atual de cooldown
     private int dmg; // Dano por ataque
     private float range; // Alcance em pixels
     private float cooldown; // Tempo entre ataques (em ticks)
+    private int level; // Nível atual da torre (1 a 3)
 
     public Tower(int x, int y, int id, int towerType) {
         this.x = x;
         this.y = y;
         this.id = id;
         this.towerType = towerType;
+        this.level = 1;
         this.setDefaultDmg();
         this.setDefaultRange();
         this.setDefaultCooldown();
@@ -63,6 +65,31 @@ public class Tower {
 
     private void setDefaultDmg() {
         this.dmg = Towers.GetStartDmg(this.towerType);
+    }
+
+    /**
+     * Aumenta o nível da torre (até 3) e melhora seus atributos.
+     * - Dano aumenta 40% por nível
+     * - Alcance aumenta 20% por nível
+     * - Cooldown reduz 15% por nível (atira mais rápido)
+     */
+    public void upgrade() {
+        if (this.level >= 3) {
+            return;
+        }
+
+        this.level++;
+        this.dmg = Math.round(this.dmg * 1.4f);
+        this.range *= 1.2F;
+        this.cooldown *= 0.85F;
+    }
+
+    public boolean canUpgrade() {
+        return this.level < 3;
+    }
+
+    public int getLevel() {
+        return this.level;
     }
 
     public int getX() {

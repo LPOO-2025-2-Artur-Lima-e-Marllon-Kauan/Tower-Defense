@@ -20,6 +20,7 @@ public class Render {
             case MENU -> this.game.getMenu().render(g);
             case SETTINGS -> this.game.getSettings().render(g);
             case EDIT -> this.game.getEditor().render(g);
+            case GAME_OVER -> this.game.getGameOver().render(g);
         }
 
     }

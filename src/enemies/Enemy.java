@@ -27,6 +27,9 @@ public abstract class Enemy {
     protected boolean alive = true; // Está vivo?
     protected int slowTickLimit = 120; // Duração do efeito de lentidão (2 segundos)
     protected int slowTick; // Contador do efeito de lentidão
+    protected boolean poisoned; // Está envenenado?
+    protected int poisonTickLimit = 180; // Duração do veneno (~3 segundos)
+    protected int poisonTick; // Contador do efeito de veneno
 
     public Enemy(float x, float y, int ID, int enemyType, EnemyManager enemyManager) {
         this.slowTick = this.slowTickLimit;
@@ -42,6 +45,19 @@ public abstract class Enemy {
 
     private void setStartHealth() {
         this.health = Enemies.GetStartHealth(this.enemyType);
+        this.maxHealth = this.health;
+    }
+
+    /**
+     * Escala a vida do inimigo de acordo com a wave atual.
+     * Usado para deixar waves posteriores progressivamente mais difíceis.
+     */
+    public void scaleForWave(int waveIndex) {
+        if (waveIndex <= 0) {
+            return;
+        }
+
+        this.health = Enemies.GetScaledHealth(this.enemyType, waveIndex);
         this.maxHealth = this.health;
     }
 
@@ -65,6 +81,34 @@ public abstract class Enemy {
 
     public void slow() {
         this.slowTick = 0;
+    }
+
+    /**
+     * Aplica efeito de veneno no inimigo
+     * O dano contínuo é processado em EnemyManager.update()
+     */
+    public void applyPoison() {
+        this.poisoned = true;
+        this.poisonTick = 0;
+    }
+
+    /**
+     * Atualiza efeitos de status como veneno
+     * Chamado a cada tick em EnemyManager.update()
+     */
+    public void updateStatusEffects() {
+        if (this.poisoned && this.alive) {
+            ++this.poisonTick;
+            // Causa 1 de dano a cada 20 ticks (~0.33s)
+            if (this.poisonTick % 20 == 0) {
+                this.hurt(1);
+            }
+
+            if (this.poisonTick >= this.poisonTickLimit || !this.alive) {
+                this.poisoned = false;
+            }
+        }
+
     }
 
     /**
@@ -138,5 +182,9 @@ public abstract class Enemy {
 
     public boolean isSlowed() {
         return this.slowTick < this.slowTickLimit;
+    }
+
+    public boolean isPoisoned() {
+        return this.poisoned;
     }
 }

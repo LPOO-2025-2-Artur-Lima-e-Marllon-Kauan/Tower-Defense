@@ -5,16 +5,16 @@
 
 package scenes;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import main.Game;
 import main.GameStates;
 import ui.MyButton;
 
 public class Menu extends GameScene implements SceneMethods {
+    // Botão único para iniciar o jogo
     private MyButton bPlaying;
-    private MyButton bEdit;
-    private MyButton bSettings;
-    private MyButton bQuit;
 
     public Menu(Game game) {
         super(game);
@@ -22,67 +22,51 @@ public class Menu extends GameScene implements SceneMethods {
     }
 
     private void initButtons() {
-        int w = 150;
-        int h = w / 3;
-        int x = 320 - w / 2;
-        int y = 150;
-        int yOffset = 100;
+        int w = 180;
+        int h = 60;
+        int x = 320 - w / 2; // centralizado horizontalmente (largura total 640)
+        int y = 400 - h / 2; // centralizado verticalmente (altura total 800)
+
+        // Único botão "Play" na tela inicial
         this.bPlaying = new MyButton("Play", x, y, w, h);
-        this.bEdit = new MyButton("Edit", x, y + yOffset, w, h);
-        this.bSettings = new MyButton("Settings", x, y + yOffset * 2, w, h);
-        this.bQuit = new MyButton("Quit", x, y + yOffset * 3, w, h);
     }
 
     public void render(Graphics g) {
+        // Fundo simples da tela inicial
+        g.setColor(new Color(15, 15, 25));
+        g.fillRect(0, 0, 640, 800);
+
+        // Título "Tower Defense" no topo
+        g.setColor(new Color(230, 230, 230));
+        g.setFont(new Font("LucidaSans", Font.BOLD, 40));
+        String title = "Tower Defense";
+        int titleWidth = g.getFontMetrics().stringWidth(title);
+        g.drawString(title, 320 - titleWidth / 2, 120);
+
+        // Botão Play centralizado
         this.drawButtons(g);
     }
 
     private void drawButtons(Graphics g) {
+        // Apenas o botão Play é desenhado na tela inicial
         this.bPlaying.draw(g);
-        this.bEdit.draw(g);
-        this.bSettings.draw(g);
-        this.bQuit.draw(g);
     }
 
     public void mouseClicked(int x, int y) {
         if (this.bPlaying.getBounds().contains(x, y)) {
             GameStates.SetGameState(GameStates.PLAYING);
-        } else if (this.bEdit.getBounds().contains(x, y)) {
-            GameStates.SetGameState(GameStates.EDIT);
-        } else if (this.bSettings.getBounds().contains(x, y)) {
-            GameStates.SetGameState(GameStates.SETTINGS);
-        } else if (this.bQuit.getBounds().contains(x, y)) {
-            System.exit(0);
         }
 
     }
 
     public void mouseMoved(int x, int y) {
-        this.bPlaying.setMouseOver(false);
-        this.bEdit.setMouseOver(false);
-        this.bSettings.setMouseOver(false);
-        this.bQuit.setMouseOver(false);
-        if (this.bPlaying.getBounds().contains(x, y)) {
-            this.bPlaying.setMouseOver(true);
-        } else if (this.bEdit.getBounds().contains(x, y)) {
-            this.bEdit.setMouseOver(true);
-        } else if (this.bSettings.getBounds().contains(x, y)) {
-            this.bSettings.setMouseOver(true);
-        } else if (this.bQuit.getBounds().contains(x, y)) {
-            this.bQuit.setMouseOver(true);
-        }
-
+        // Apenas o botão Play existe na tela inicial
+        this.bPlaying.setMouseOver(this.bPlaying.getBounds().contains(x, y));
     }
 
     public void mousePressed(int x, int y) {
         if (this.bPlaying.getBounds().contains(x, y)) {
             this.bPlaying.setMousePressed(true);
-        } else if (this.bEdit.getBounds().contains(x, y)) {
-            this.bEdit.setMousePressed(true);
-        } else if (this.bSettings.getBounds().contains(x, y)) {
-            this.bSettings.setMousePressed(true);
-        } else if (this.bQuit.getBounds().contains(x, y)) {
-            this.bQuit.setMousePressed(true);
         }
 
     }
@@ -93,9 +77,6 @@ public class Menu extends GameScene implements SceneMethods {
 
     private void resetButtons() {
         this.bPlaying.resetBooleans();
-        this.bEdit.resetBooleans();
-        this.bSettings.resetBooleans();
-        this.bQuit.resetBooleans();
     }
 
     public void mouseDragged(int x, int y) {
