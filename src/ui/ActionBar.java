@@ -21,8 +21,9 @@ import scenes.Playing;
  */
 public class ActionBar extends Bar {
     private final Playing playing;
-    private MyButton bMenu; // Botão para voltar ao menu
-    private MyButton[] towerButtons; // 3 botões para comprar torres
+    // Botões para selecionar as torres disponíveis
+    private MyButton[] towerButtons; // 4 botões para comprar torres (inclui Cospe Veneno)
+    private MyButton upgradeButton; // Botão para fazer upgrade da torre selecionada
     private Tower displayedTower; // Torre clicada para exibir informações
     private final DecimalFormat formatter; // Formatação de números decimais (timer)
     private int gold = 100; // Ouro inicial do jogador
@@ -42,25 +43,33 @@ public class ActionBar extends Bar {
      * - 3 botões de torres (Cannon, Archer, Wizard)
      */
     private void initButtons() {
-        this.bMenu = new MyButton("Menu", 2, 642, 100, 30);
-        this.towerButtons = new MyButton[3];
+        this.towerButtons = new MyButton[4];
         int w = 50;
         int h = 50;
-        int xStart = 110;
-        int yStart = 650;
-        int xOffset = (int)((float)w * 1.1F); // 10% de espaço entre botões
+        int xStart = 20;   // alinhado mais à esquerda para um layout limpo
+        int yStart = 660;  // um pouco acima da base da ActionBar
+        int xOffset = (int)(w * 1.2f); // pequeno espaço entre botões
 
-        // Cria os 3 botões de torres com IDs correspondentes
-        for(int i = 0; i < this.towerButtons.length; ++i) {
+        // Cria os 4 botões de torres com IDs correspondentes
+        for (int i = 0; i < this.towerButtons.length; ++i) {
             this.towerButtons[i] = new MyButton("", xStart + xOffset * i, yStart, w, h, i);
         }
 
+        // Botão de upgrade da torre selecionada
+        int upgW = 110;
+        int upgH = 35;
+        int upgX = 480;
+        int upgY = 700;
+        this.upgradeButton = new MyButton("Upgrade", upgX, upgY, upgW, upgH);
     }
 
     private void drawButtons(Graphics g) {
-        this.bMenu.draw(g);
+        // Título da área de seleção de torres
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("LucidaSans", Font.BOLD, 16));
+        g.drawString("Torres", 20, 650);
 
-        for(MyButton b : this.towerButtons) {
+        for (MyButton b : this.towerButtons) {
             g.setColor(Color.gray);
             g.fillRect(b.x, b.y, b.width, b.height);
 
@@ -70,6 +79,7 @@ public class ActionBar extends Bar {
                 case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
                 case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
                 case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
+                case 3 -> col = new Color(80, 200, 120); // Cospe Veneno - verde venenoso
                 default -> col = Color.MAGENTA;
             }
             g.setColor(col);
@@ -86,17 +96,15 @@ public class ActionBar extends Bar {
      * Renderiza toda a ActionBar e seus componentes
      */
     public void draw(Graphics g) {
-        // Fundo laranja da barra
-        g.setColor(new Color(220, 123, 15));
+        // Fundo simples e escuro da barra inferior
+        g.setColor(new Color(25, 25, 35));
         g.fillRect(this.x, this.y, this.width, this.height);
-        
-        // Desenha todos os elementos da UI
+
+        // Elementos principais do HUD: torres, info de torre e HUD de waves/recursos
         this.drawButtons(g);
         this.drawDisplayedTower(g);
         this.drawWaveInfo(g);
-        this.drawGoldAmount(g);
-        this.drawLives(g);
-        
+
         // Tooltip de custo da torre (ao passar mouse)
         if (this.showTowerCost) {
             this.drawTowerCost(g);
@@ -138,12 +146,13 @@ public class ActionBar extends Bar {
     }
 
     private void drawGoldAmount(Graphics g) {
-        g.drawString("Gold: " + this.gold + "g", 110, 725);
+        // Mesmo estilo de texto das waves, posicionado à direita
+        g.drawString("Ouro: " + this.gold + "g", 425, 720);
     }
 
     private void drawLives(Graphics g) {
-        g.setColor(Color.black);
-        g.drawString("Lives: " + this.playing.getLives(), 350, 725);
+        // Logo abaixo do ouro, ainda acima das waves
+        g.drawString("Vidas: " + this.playing.getLives(), 425, 735);
     }
 
     /**
@@ -155,6 +164,11 @@ public class ActionBar extends Bar {
     private void drawWaveInfo(Graphics g) {
         g.setColor(Color.black);
         g.setFont(new Font("LucidaSans", Font.BOLD, 20));
+
+        // Ouro e vidas acima das informações de wave/inimigos, mesmo estilo de fonte
+        this.drawGoldAmount(g);
+        this.drawLives(g);
+
         this.drawWaveTimerInfo(g);
         this.drawEnemiesLeftInfo(g);
         this.drawWavesLeftInfo(g);
@@ -186,34 +200,32 @@ public class ActionBar extends Bar {
      */
     private void drawDisplayedTower(Graphics g) {
         if (this.displayedTower != null) {
-            // Caixa de informações da torre
-            g.setColor(Color.gray);
-            g.fillRect(410, 645, 220, 85);
-            g.setColor(Color.black);
-            g.drawRect(410, 645, 220, 85);
-            g.drawRect(420, 650, 50, 50);
-            
-            // Desenha bloco colorido da torre
-            Color col;
-            switch (this.displayedTower.getTowerType()) {
-                case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
-                case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
-                case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
-                default -> col = Color.MAGENTA;
-            }
-            g.setColor(col);
-            g.fillRect(425, 655, 40, 40);
-            g.setColor(Color.black);
-            g.drawRect(425, 655, 40, 40);
+            // Destaque no mapa
+            this.drawDisplayedTowerBorder(g); // borda azul em volta da torre
+            this.drawDisplayedTowerRange(g);  // círculo de alcance
 
-            g.setFont(new Font("LucidaSans", Font.BOLD, 15));
-            g.setColor(Color.black);
-            g.drawString(Towers.GetName(this.displayedTower.getTowerType()), 490, 660);
-            g.drawString("ID: " + this.displayedTower.getId(), 490, 675);
-            
-            // Feedback visual no mapa
-            this.drawDisplayedTowerBorder(g); // Borda azul
-            this.drawDisplayedTowerRange(g);  // Círculo de alcance
+            // Painel de informações da torre selecionada
+            int infoX = 20;
+            int infoY = 700;
+            int infoW = 260;
+            int infoH = 85;
+
+            g.setColor(new Color(40, 40, 60));
+            g.fillRect(infoX, infoY, infoW, infoH);
+            g.setColor(Color.WHITE);
+            g.drawRect(infoX, infoY, infoW, infoH);
+
+            g.setFont(new Font("LucidaSans", Font.BOLD, 14));
+            String name = Towers.GetName(this.displayedTower.getTowerType());
+            g.drawString(name + " Lv." + this.displayedTower.getLevel(), infoX + 10, infoY + 20);
+
+            g.setFont(new Font("LucidaSans", Font.PLAIN, 12));
+            g.drawString("Dano: " + this.displayedTower.getDmg(), infoX + 10, infoY + 40);
+            g.drawString("Alcance: " + (int)this.displayedTower.getRange(), infoX + 10, infoY + 55);
+            g.drawString("Cooldown: " + (int)this.displayedTower.getCooldown(), infoX + 10, infoY + 70);
+
+            // Informações de upgrade e botão
+            this.drawUpgradeSection(g, infoX + infoW + 10, infoY);
         }
 
     }
@@ -232,28 +244,65 @@ public class ActionBar extends Bar {
         this.displayedTower = t;
     }
 
+    private void drawUpgradeSection(Graphics g, int x, int y) {
+        if (this.displayedTower == null) {
+            return;
+        }
+
+        g.setFont(new Font("LucidaSans", Font.PLAIN, 12));
+        g.setColor(Color.WHITE);
+
+        int currentLevel = this.displayedTower.getLevel();
+        if (currentLevel >= Towers.MAX_LEVEL) {
+            g.drawString("Nível máximo alcançado", x, y + 20);
+            return;
+        }
+
+        int nextLevel = currentLevel + 1;
+        int cost = Towers.GetUpgradeCost(this.displayedTower.getTowerType(), currentLevel);
+        g.drawString("Upgrade -> Lv." + nextLevel, x, y + 20);
+        g.drawString("Custo: " + cost + "g", x, y + 40);
+
+        // Feedback visual se não tiver ouro suficiente
+        if (this.gold < cost) {
+            g.setColor(Color.RED);
+            g.drawString("Ouro insuficiente", x, y + 60);
+        }
+
+        // Desenha o botão de upgrade
+        boolean canAfford = this.gold >= cost;
+        g.setColor(canAfford ? new Color(80, 180, 80) : new Color(90, 90, 90));
+        g.fillRect(this.upgradeButton.x, this.upgradeButton.y, this.upgradeButton.width, this.upgradeButton.height);
+        g.setColor(Color.BLACK);
+        g.drawRect(this.upgradeButton.x, this.upgradeButton.y, this.upgradeButton.width, this.upgradeButton.height);
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("LucidaSans", Font.BOLD, 14));
+        g.drawString("Upgrade", this.upgradeButton.x + 12, this.upgradeButton.y + 22);
+    }
+
     /**
      * Gerencia cliques nos botões da ActionBar
      * - Botão Menu: volta ao menu principal
      * - Botões de Torres: seleciona torre para construir (se tiver ouro)
      */
     public void mouseClicked(int x, int y) {
-        if (this.bMenu.getBounds().contains(x, y)) {
-            GameStates.SetGameState(GameStates.MENU);
-        } else {
-            for(MyButton b : this.towerButtons) {
-                if (b.getBounds().contains(x, y)) {
-                    // Verifica se tem ouro suficiente
-                    if (!this.isGoldEnoughForTower(b.getId())) {
-                        return;
-                    }
-
-                    // Cria torre temporária para posicionamento
-                    Tower selectedTower = new Tower(0, 0, -1, b.getId());
-                    this.playing.setSelectedTower(selectedTower);
+        for (MyButton b : this.towerButtons) {
+            if (b.getBounds().contains(x, y)) {
+                // Verifica se tem ouro suficiente
+                if (!this.isGoldEnoughForTower(b.getId())) {
                     return;
                 }
+
+                // Cria torre temporária para posicionamento
+                Tower selectedTower = new Tower(0, 0, -1, b.getId());
+                this.playing.setSelectedTower(selectedTower);
+                return;
             }
+        }
+
+        // Clique no botão de upgrade da torre selecionada
+        if (this.displayedTower != null && this.upgradeButton.getBounds().contains(x, y)) {
+            this.tryUpgradeDisplayedTower();
         }
 
     }
@@ -267,50 +316,49 @@ public class ActionBar extends Bar {
      * Mostra tooltip de custo quando mouse está sobre botão de torre
      */
     public void mouseMoved(int x, int y) {
-        // Reseta todos os estados de hover
-        this.bMenu.setMouseOver(false);
+        // Reseta estados de hover dos botões de torre
         this.showTowerCost = false;
 
-        for(MyButton b : this.towerButtons) {
+        for (MyButton b : this.towerButtons) {
             b.setMouseOver(false);
         }
+        this.upgradeButton.setMouseOver(false);
 
         // Verifica qual botão está sob o mouse
-        if (this.bMenu.getBounds().contains(x, y)) {
-            this.bMenu.setMouseOver(true);
-        } else {
-            for(MyButton b : this.towerButtons) {
-                if (b.getBounds().contains(x, y)) {
-                    b.setMouseOver(true);
-                    this.showTowerCost = true;    // Ativa tooltip
-                    this.towerCostType = b.getId(); // Define tipo para tooltip
-                    return;
-                }
+        for (MyButton b : this.towerButtons) {
+            if (b.getBounds().contains(x, y)) {
+                b.setMouseOver(true);
+                this.showTowerCost = true;    // Ativa tooltip
+                this.towerCostType = b.getId(); // Define tipo para tooltip
+                return;
             }
+        }
+
+        if (this.displayedTower != null && this.upgradeButton.getBounds().contains(x, y)) {
+            this.upgradeButton.setMouseOver(true);
         }
 
     }
 
     public void mousePressed(int x, int y) {
-        if (this.bMenu.getBounds().contains(x, y)) {
-            this.bMenu.setMousePressed(true);
-        } else {
-            for(MyButton b : this.towerButtons) {
-                if (b.getBounds().contains(x, y)) {
-                    b.setMousePressed(true);
-                    return;
-                }
+        for (MyButton b : this.towerButtons) {
+            if (b.getBounds().contains(x, y)) {
+                b.setMousePressed(true);
+                return;
             }
+        }
+
+        if (this.displayedTower != null && this.upgradeButton.getBounds().contains(x, y)) {
+            this.upgradeButton.setMousePressed(true);
         }
 
     }
 
     public void mouseReleased(int x, int y) {
-        this.bMenu.resetBooleans();
-
-        for(MyButton b : this.towerButtons) {
+        for (MyButton b : this.towerButtons) {
             b.resetBooleans();
         }
+        this.upgradeButton.resetBooleans();
 
     }
 
@@ -319,6 +367,24 @@ public class ActionBar extends Bar {
      */
     public void payForTower(int towerType) {
         this.gold -= Towers.GetTowerCost(towerType);
+    }
+
+    /**
+     * Tenta fazer upgrade da torre exibida, verificando ouro e limite de nível.
+     */
+    private void tryUpgradeDisplayedTower() {
+        if (this.displayedTower == null || !this.displayedTower.canUpgrade()) {
+            return;
+        }
+
+        int currentLevel = this.displayedTower.getLevel();
+        int cost = Towers.GetUpgradeCost(this.displayedTower.getTowerType(), currentLevel);
+        if (cost <= 0 || this.gold < cost) {
+            return;
+        }
+
+        this.gold -= cost;
+        this.displayedTower.upgrade();
     }
 
     /**

@@ -64,8 +64,58 @@ public class WaveManager {
     }
 
     private void createWaves() {
-        this.waves.add(new Wave(new ArrayList(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 1))));
-        this.waves.add(new Wave(new ArrayList(Arrays.asList(2, 0, 0, 0, 0, 0, 0, 0, 0, 1))));
+        // 10 waves progressivas, aumentando quantidade, vida (via escala) e velocidade (via escala)
+        // Tipos: 0=Orc, 1=Bat, 2=Knight, 3=Wolf
+
+        // Wave 1 - apenas Orcs, bem simples
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ))));
+
+        // Wave 2 - mais Orcs e alguns Bats rápidos
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1
+        ))));
+
+        // Wave 3 - mistura forte de Orc + Bat
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+        ))));
+
+        // Wave 4 - introduz Wolf (rápido)
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3
+        ))));
+
+        // Wave 5 - mais inimigos rápidos (Bat + Wolf)
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                1, 1, 1, 0, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1
+        ))));
+
+        // Wave 6 - introduz Knight (muita vida)
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                0, 0, 2, 0, 0, 3, 0, 2, 0, 3, 0, 2, 0, 3
+        ))));
+
+        // Wave 7 - Wolves constantes com suporte de Bats e um Knight final
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                3, 0, 1, 3, 0, 1, 3, 0, 1, 3, 0, 1, 2
+        ))));
+
+        // Wave 8 - Wave pesada com vários Knights e Wolves
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                3, 3, 1, 1, 0, 0, 3, 3, 1, 1, 0, 0, 2, 2
+        ))));
+
+        // Wave 9 - muita pressão de Wolves e Knights
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                3, 1, 3, 1, 3, 1, 3, 1, 2, 0, 2, 0, 2, 0, 2, 0
+        ))));
+
+        // Wave 10 - wave final muito difícil (muitos rápidos e tanques)
+        this.waves.add(new Wave(new ArrayList(Arrays.asList(
+                3, 3, 3, 1, 1, 1, 2, 2, 2, 0, 0, 0, 3, 3, 3, 1, 1, 1, 2, 2, 2
+        ))));
     }
 
     public ArrayList<Wave> getWaves() {

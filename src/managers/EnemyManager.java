@@ -5,15 +5,13 @@
 
 package managers;
 
-import enemies.Bat;
+import enemies.*;
 import enemies.Enemy;
-import enemies.Knight;
-import enemies.Orc;
-import enemies.Wolf;
 import helpz.Constants.Enemies;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import objects.PathPoint;
 import scenes.Playing;
@@ -24,23 +22,25 @@ import scenes.Playing;
  */
 public class EnemyManager {
     private final Playing playing;
-    // sprites foram removidos — usamos blocos coloridos para representar inimigos
+    // sprites simples por tipo de inimigo (um quadrado colorido por tipo)
     private final ArrayList<Enemy> enemies = new ArrayList<>(); // Lista de todos os inimigos ativos
     private final PathPoint start; // Ponto inicial do caminho
     private final PathPoint end; // Ponto final do caminho (onde inimigos escapam)
     private static final int HPbarWidth = 20; // Largura da barra de vida em pixels
+    private BufferedImage[] enemySprites; // Sprites simples para cada tipo de inimigo
 
     public EnemyManager(Playing playing, PathPoint start, PathPoint end) {
         this.playing = playing;
         this.start = start;
         this.end = end;
-        // sem carregamento de sprites para inimigos — projéteis permanecem com sprites
+        this.initEnemySprites();
     }
 
     public void update() {
         for(Enemy e : this.enemies) {
             if (e.isAlive()) {
                 this.updateEnemyMove(e);
+                e.updateStatusEffects(); // atualiza veneno e outros efeitos
             }
         }
 
@@ -70,9 +70,11 @@ public class EnemyManager {
         int newX = (int)(e.getX() + this.getSpeedAndWidth(e.getLastDir(), e.getEnemyType()));
         int newY = (int)(e.getY() + this.getSpeedAndHeight(e.getLastDir(), e.getEnemyType()));
 
+        float speed = Enemies.GetSpeedScaled(e.getEnemyType(), this.playing.getWaveManager().getWaveIndex());
+
         // Verifica se a próxima posição é estrada (tile tipo 2)
         if (this.getTileType(newX, newY) == 2) {
-            e.move(Enemies.GetSpeed(e.getEnemyType()), e.getLastDir());
+            e.move(speed, e.getLastDir());
         } else {
             this.setNewDirectionAndMove(e); // Saiu da estrada, precisa virar
         }
@@ -94,20 +96,21 @@ public class EnemyManager {
 
         if (!this.isAtEnd(e)) {
             // Se estava indo vertical (UP ou DOWN), tenta horizontal
+            float speed = Enemies.GetSpeedScaled(e.getEnemyType(), this.playing.getWaveManager().getWaveIndex());
             if (dir != 0 && dir != 2) {
                 int newX = (int)(e.getX() + this.getSpeedAndWidth(2, e.getEnemyType()));
                 if (this.getTileType(newX, (int)e.getY()) == 2) {
-                    e.move(Enemies.GetSpeed(e.getEnemyType()), 2); // Move para DIREITA
+                    e.move(speed, 2); // Move para DIREITA
                 } else {
-                    e.move(Enemies.GetSpeed(e.getEnemyType()), 0); // Move para ESQUERDA
+                    e.move(speed, 0); // Move para ESQUERDA
                 }
             } else {
                 // Se estava indo horizontal, tenta vertical
                 int newY = (int)(e.getY() + this.getSpeedAndHeight(1, e.getEnemyType()));
                 if (this.getTileType((int)e.getX(), newY) == 2) {
-                    e.move(Enemies.GetSpeed(e.getEnemyType()), 1); // Move para CIMA
+                    e.move(speed, 1); // Move para CIMA
                 } else {
-                    e.move(Enemies.GetSpeed(e.getEnemyType()), 3); // Move para BAIXO
+                    e.move(speed, 3); // Move para BAIXO
                 }
             }
 
@@ -141,18 +144,20 @@ public class EnemyManager {
     }
 
     private float getSpeedAndHeight(int dir, int enemyType) {
+        float speed = Enemies.GetSpeedScaled(enemyType, this.playing.getWaveManager().getWaveIndex());
         if (dir == 1) {
-            return -Enemies.GetSpeed(enemyType);
+            return -speed;
         } else {
-            return dir == 3 ? Enemies.GetSpeed(enemyType) + 32.0F : 0.0F;
+            return dir == 3 ? speed + 32.0F : 0.0F;
         }
     }
 
     private float getSpeedAndWidth(int dir, int enemyType) {
+        float speed = Enemies.GetSpeedScaled(enemyType, this.playing.getWaveManager().getWaveIndex());
         if (dir == 0) {
-            return -Enemies.GetSpeed(enemyType);
+            return -speed;
         } else {
-            return dir == 2 ? Enemies.GetSpeed(enemyType) + 32.0F : 0.0F;
+            return dir == 2 ? speed + 32.0F : 0.0F;
         }
     }
 
@@ -171,11 +176,18 @@ public class EnemyManager {
     public void addEnemy(int enemyType) {
         int x = this.start.getxCord() * 32; // Converte coordenada de tile para pixels
         int y = this.start.getyCord() * 32;
+        Enemy e = null;
         switch (enemyType) {
-            case 0 -> this.enemies.add(new Orc((float)x, (float)y, 0, this));
-            case 1 -> this.enemies.add(new Bat((float)x, (float)y, 0, this));
-            case 2 -> this.enemies.add(new Knight((float)x, (float)y, 0, this));
-            case 3 -> this.enemies.add(new Wolf((float)x, (float)y, 0, this));
+            case 0 -> e = new Orc((float)x, (float)y, 0, this);
+            case 1 -> e = new Bat((float)x, (float)y, 0, this);
+            case 2 -> e = new Knight((float)x, (float)y, 0, this);
+            case 3 -> e = new Wolf((float)x, (float)y, 0, this);
+        }
+
+        if (e != null) {
+            int waveIndex = this.playing.getWaveManager().getWaveIndex();
+            e.scaleForWave(waveIndex);
+            this.enemies.add(e);
         }
 
     }
@@ -201,6 +213,15 @@ public class EnemyManager {
             g2.setColor(old);
         }
 
+        if (e.isPoisoned()) {
+            // overlay verde semi-transparente indicando veneno
+            Graphics2D g2 = (Graphics2D) g;
+            Color old = g2.getColor();
+            g2.setColor(new Color(0, 180, 0, 90));
+            g2.fillRect((int)e.getX(), (int)e.getY(), 32, 32);
+            g2.setColor(old);
+        }
+
     }
 
     private void drawHealthBar(Enemy e, Graphics g) {
@@ -213,29 +234,57 @@ public class EnemyManager {
     }
 
     private void drawEnemy(Enemy e, Graphics g) {
-        // desenha um bloco colorido representando o inimigo (24x24 pixels, centralizado)
+        // desenha um sprite simples (quadrado colorido 24x24 pixels, centralizado)
         final int blockSize = 24;
         final int offset = 4; // (32-24)/2 para centralizar no tile
         int x = (int)e.getX() + offset;
         int y = (int)e.getY() + offset;
 
-        Color col;
-        switch (e.getEnemyType()) {
-            case 0 -> col = new Color(134, 94, 66); // Orc
-            case 1 -> col = new Color(150, 150, 150); // Bat
-            case 2 -> col = new Color(120, 120, 160); // Knight
-            case 3 -> col = new Color(80, 80, 80); // Wolf
-            default -> col = Color.MAGENTA;
+        int type = e.getEnemyType();
+        if (this.enemySprites != null && type >= 0 && type < this.enemySprites.length && this.enemySprites[type] != null) {
+            g.drawImage(this.enemySprites[type], x, y, null);
+        } else {
+            // fallback para bloco colorido caso sprite não exista
+            Color col;
+            switch (type) {
+                case 0 -> col = new Color(134, 94, 66); // Orc
+                case 1 -> col = new Color(150, 150, 150); // Bat
+                case 2 -> col = new Color(120, 120, 160); // Knight
+                case 3 -> col = new Color(80, 80, 80); // Wolf
+                default -> col = Color.MAGENTA;
+            }
+            g.setColor(col);
+            g.fillRect(x, y, blockSize, blockSize);
+            g.setColor(Color.black);
+            g.drawRect(x, y, blockSize, blockSize);
         }
-        g.setColor(col);
-        g.fillRect(x, y, blockSize, blockSize);
-        // contorno
-        g.setColor(Color.black);
-        g.drawRect(x, y, blockSize, blockSize);
     }
 
     public ArrayList<Enemy> getEnemies() {
         return this.enemies;
+    }
+
+    /**
+     * Inicializa sprites simples (quadrados coloridos) para cada tipo de inimigo.
+     */
+    private void initEnemySprites() {
+        this.enemySprites = new BufferedImage[4];
+        this.enemySprites[Enemies.ORC] = this.createColoredSprite(new Color(134, 94, 66));
+        this.enemySprites[Enemies.BAT] = this.createColoredSprite(new Color(150, 150, 150));
+        this.enemySprites[Enemies.KNIGHT] = this.createColoredSprite(new Color(120, 120, 160));
+        this.enemySprites[Enemies.WOLF] = this.createColoredSprite(new Color(80, 80, 80));
+    }
+
+    private BufferedImage createColoredSprite(Color color) {
+        int size = 24;
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        g2.setColor(color);
+        g2.fillRect(0, 0, size, size);
+        g2.setColor(Color.black);
+        g2.drawRect(0, 0, size - 1, size - 1);
+        g2.dispose();
+        return img;
     }
 
     /**

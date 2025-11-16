@@ -33,11 +33,14 @@ public class ProjectileManager {
 
     private void importImgs() {
         BufferedImage atlas = LoadSave.getSpriteAtlas();
-        this.proj_imgs = new BufferedImage[3];
+        this.proj_imgs = new BufferedImage[4];
 
         for(int i = 0; i < 3; ++i) {
             this.proj_imgs[i] = atlas.getSubimage((7 + i) * 32, 32, 32, 32);
         }
+
+        // Projétil de veneno reutiliza o sprite de CHAINS para simplificar
+        this.proj_imgs[3] = this.proj_imgs[1];
 
         this.importExplosion(atlas);
     }
@@ -122,6 +125,8 @@ public class ProjectileManager {
                 e.hurt(p.getDmg());
                 if (p.getProjectileType() == 1) {
                     e.slow();
+                } else if (p.getProjectileType() == 3) {
+                    e.applyPoison();
                 }
 
                 return true;
@@ -170,6 +175,9 @@ public class ProjectileManager {
             }
             case 2 -> {
                 return 1;
+            }
+            case 3 -> {
+                return 3; // Torre Cospe Veneno usa projétil de veneno
             }
             default -> {
                 return 0;

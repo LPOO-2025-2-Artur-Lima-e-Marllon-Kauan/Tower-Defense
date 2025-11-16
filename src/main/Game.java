@@ -13,6 +13,7 @@ import scenes.Editing;
 import scenes.Menu;
 import scenes.Playing;
 import scenes.Settings;
+import scenes.GameOver;
 
 /**
  * Classe principal do jogo Tower Defense
@@ -31,6 +32,7 @@ public class Game extends JFrame implements Runnable {
     private Playing playing;
     private Settings settings;
     private Editing editing;
+    private GameOver gameOver;
     private TileManager tileManager;
 
     /**
@@ -73,6 +75,7 @@ public class Game extends JFrame implements Runnable {
         this.playing = new Playing(this);
         this.settings = new Settings(this);
         this.editing = new Editing(this);
+        this.gameOver = new GameOver(this);
     }
 
     private void start() {
@@ -167,7 +170,16 @@ public class Game extends JFrame implements Runnable {
         return this.editing;
     }
 
+    public GameOver getGameOver() {
+        return this.gameOver;
+    }
+
     public TileManager getTileManager() {
         return this.tileManager;
+    }
+
+    // Reinicia o estado de jogo (usado ao clicar em Reiniciar na tela de Game Over)
+    public void resetPlaying() {
+        this.playing = new Playing(this);
     }
 }

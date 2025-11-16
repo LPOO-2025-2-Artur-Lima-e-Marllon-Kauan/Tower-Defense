@@ -6,6 +6,7 @@
 package managers;
 
 import enemies.Enemy;
+import helpz.Constants.Towers;
 import helpz.Utilz;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -56,11 +57,38 @@ public class TowerManager {
      * 3. Cooldown da torre acabou
      */
     private void attackEnemyIfClose(Tower t) {
-        for(Enemy e : this.playing.getEnemyManger().getEnemies()) {
-            if (e.isAlive() && this.isEnemyInRange(t, e) && t.isCooldownOver()) {
-                this.playing.shootEnemy(t, e); // Cria projétil
-                t.resetCooldown(); // Reinicia tempo de espera para próximo ataque
+        // Torre Cospe Veneno sempre mira no inimigo mais próximo dentro do alcance
+        if (!t.isCooldownOver()) {
+            return;
+        }
+
+        Enemy target = null;
+
+        if (t.getTowerType() == Towers.POISON) {
+            float closestDist = Float.MAX_VALUE;
+
+            for (Enemy e : this.playing.getEnemyManger().getEnemies()) {
+                if (e.isAlive() && this.isEnemyInRange(t, e)) {
+                    int dist = Utilz.GetHypoDistance((float)t.getX(), (float)t.getY(), e.getX(), e.getY());
+                    if ((float)dist < closestDist) {
+                        closestDist = (float)dist;
+                        target = e;
+                    }
+                }
             }
+        } else {
+            // Demais torres mantêm o comportamento simples: primeiro inimigo encontrado no alcance
+            for (Enemy e : this.playing.getEnemyManger().getEnemies()) {
+                if (e.isAlive() && this.isEnemyInRange(t, e)) {
+                    target = e;
+                    break;
+                }
+            }
+        }
+
+        if (target != null) {
+            this.playing.shootEnemy(t, target); // Cria projétil
+            t.resetCooldown(); // Reinicia tempo de espera para próximo ataque
         }
 
     }
@@ -87,6 +115,7 @@ public class TowerManager {
                 case 0 -> col = new Color(220, 100, 50); // Cannon - laranja
                 case 1 -> col = new Color(100, 200, 50); // Archer - verde-claro
                 case 2 -> col = new Color(150, 100, 200); // Wizard - roxo
+                case 3 -> col = new Color(80, 200, 120); // Cospe Veneno - verde venenoso
                 default -> col = Color.MAGENTA;
             }
             g.setColor(col);
