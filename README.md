@@ -1,4 +1,4 @@
-w## Tower Defense em Java - Poli - UPE
+## Tower Defense em Java - Poli - UPE
 ### 🎮 Sobre o Projeto
 
 Este projeto é um jogo do gênero Tower Defense, desenvolvido inteiramente em Java como parte da disciplina de Linguagem de Programação Orientada a Objetos (LPOO) da Escola Politécnica de Pernambuco.
