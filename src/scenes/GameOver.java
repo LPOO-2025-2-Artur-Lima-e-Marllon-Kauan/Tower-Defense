@@ -44,7 +44,7 @@ public class GameOver extends GameScene implements SceneMethods {
 
         // Mensagem "Game Over" logo abaixo do título
         g.setFont(new Font("LucidaSans", Font.BOLD, 32));
-        String gameOverText = "Game Over";
+        String gameOverText = "Fim de Jogo";
         int goWidth = g.getFontMetrics().stringWidth(gameOverText);
         g.drawString(gameOverText, 320 - goWidth / 2, 200);
 
