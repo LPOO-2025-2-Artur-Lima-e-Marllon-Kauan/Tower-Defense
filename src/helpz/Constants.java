@@ -111,7 +111,7 @@ public class Constants {
         public static int GetStartDmg(int towerType) {
             switch (towerType) {
                 case 0 -> {
-                    return 15; // Cannon - alto dano
+                    return 10; // Cannon - alto dano
                 }
                 case 1 -> {
                     return 5;  // Archer - baixo dano
@@ -120,7 +120,7 @@ public class Constants {
                     return 0;  // Wizard - apenas aplica slow
                 }
                 case 3 -> {
-                    return 2;  // Cospe Veneno - dano base baixo + dano contínuo
+                    return 5;  // Cospe Veneno - dano base baixo + dano contínuo
                 }
                 default -> {
                     return 0;

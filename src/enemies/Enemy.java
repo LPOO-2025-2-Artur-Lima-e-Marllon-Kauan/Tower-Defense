@@ -101,7 +101,7 @@ public abstract class Enemy {
             ++this.poisonTick;
             // Causa 1 de dano a cada 20 ticks (~0.33s)
             if (this.poisonTick % 20 == 0) {
-                this.hurt(1);
+                this.hurt(4);
             }
 
             if (this.poisonTick >= this.poisonTickLimit || !this.alive) {
