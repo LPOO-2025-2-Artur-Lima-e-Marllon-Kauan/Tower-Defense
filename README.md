@@ -27,27 +27,66 @@ O objetivo do jogo é impedir que inimigos cheguem ao final do caminho, posicion
 ### Estrutura do Projeto
 ```
 src/
- ┣━ EntidadesDoJogo/         # Classes que representam inimigos, torres, etc
- ┃   ┣━ Inimigo.java         # Classe base para os inimigos
- ┃   ┣━ Player.java          # Classe para as ações do player
-   
+ ┣━ enemies/                     # Classes dos inimigos
+ ┃   ┣━ Bat.java
+ ┃   ┣━ Cavaleiro.java
+ ┃   ┣━ Enemy.java               # Classe base dos inimigos
+ ┃   ┣━ Lobo.java
+ ┃   ┗━ Orc.java
 
- ┣━ Map/                     # Classes relacionadas ao mapa do jogo
- ┃   ┣━ Mapa.java             
- ┃   ┣━ Tile.java            
- ┃   ┗━ Position.java        
+ ┣━ eventos/
+ ┃   ┗━ Wave.java                # Representa uma wave de inimigos
 
- ┣━ imagens/                 # Imagens usadas no jogo
+ ┣━ helpz/                       # Classes auxiliares do projeto
+ ┃   ┣━ Constants.java
+ ┃   ┣━ ImgFix.java
+ ┃   ┣━ LoadSave.java            # Carrega e salva sprites/dados
+ ┃   ┗━ Utilz.java
 
- ┣━ Fase.java                # Geração das fases
+ ┣━ inputs/
+ ┃   ┣━ KeyboardListener.java
+ ┃   ┗━ MyMouseListener.java
 
- ┣━ GameLoop.java            # Loop de gameplay
+ ┣━ main/
+ ┃   ┣━ Game.java
+ ┃   ┣━ GameScreen.java
+ ┃   ┣━ GameStates.java
+ ┃   ┗━ Render.java
 
- ┣━ InicioDeGame.java        
+ ┣━ managers/                    # Gerenciadores do jogo
+ ┃   ┣━ EnemyManager.java
+ ┃   ┣━ ProjectileManager.java
+ ┃   ┣━ TileManager.java
+ ┃   ┣━ TowerManager.java
+ ┃   ┗━ WaveManager.java
 
- ┣━ Interface.java           # Elementos que compõe a interface do jogo
- 
- ┣━ Main.java                # Classe principal que inicia o jogo
+ ┣━ objects/                     # Entidades principais do mapa
+ ┃   ┣━ PathPoint.java
+ ┃   ┣━ Projectile.java
+ ┃   ┣━ Tile.java
+ ┃   ┗━ Tower.java
+
+res/
+ ┣━ new_level.txt                # Dados do mapa
+ ┣━ old_spriteatlas.png
+ ┣━ sprite.png
+ ┣━ spriteatlas.png
+
+ ┣━ scenes/                      # Telas do jogo
+ ┃   ┣━ Editing.java
+ ┃   ┣━ GameOver.java
+ ┃   ┣━ GameScene.java
+ ┃   ┣━ Menu.java
+ ┃   ┣━ Playing.java
+ ┃   ┣━ SceneMethods.java
+ ┃   ┗━ Settings.java
+
+ ┗━ ui/                           # Elementos da interface
+     ┣━ ActionBar.java
+     ┣━ Bar.java
+     ┣━ MyButton.java
+     ┗━ Toolbar.java
+
 
 ```
 
